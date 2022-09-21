@@ -45,16 +45,22 @@ export const handler: Handler = async (event) => {
     },
   };
 
+  const children: object[] = [];
+
   if (data.description) {
-    properties.Description = {
-      rich_text: [
-        {
-          text: {
-            content: data.description,
+    children.push({
+      type: 'paragraph',
+      paragraph: {
+        rich_text: [
+          {
+            type: 'text',
+            text: {
+              content: data.description,
+            },
           },
-        },
-      ],
-    };
+        ],
+      },
+    });
   }
 
   if (data.date) {
@@ -84,21 +90,7 @@ export const handler: Handler = async (event) => {
     body: JSON.stringify({
       parent: { database_id: '29f4a66d910f43a9b70b4c7eda097187' },
       properties,
-      children: [
-        {
-          type: 'paragraph',
-          paragraph: {
-            rich_text: [
-              {
-                type: 'text',
-                text: {
-                  content: data.description,
-                },
-              },
-            ],
-          },
-        },
-      ],
+      children,
     }),
   }).then((res) => res.json());
 
