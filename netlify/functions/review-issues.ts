@@ -97,4 +97,4 @@ const reviewIssues: Handler = async () => {
   };
 };
 
-export const handler = schedule('0 6 * * 1,4', reviewIssues);
+export const handler = schedule('0 12 * * 1,4', reviewIssues);
