@@ -1,3 +1,6 @@
+import type { RequestInit } from 'node-fetch';
+import fetch from 'node-fetch';
+
 export function slackApi(endpoint: string, body?: object) {
   const options: RequestInit = {
     method: 'GET',
