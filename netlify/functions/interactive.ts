@@ -1,100 +1,89 @@
 import type { Handler } from '@netlify/functions';
 import { parse } from 'querystring';
 
+import { getUserByEmail, RequestEntry } from './utils/notion';
+import { blocks, properties, notionApi } from './utils/notion';
+import { slackApi } from './utils/slack';
+
 export const handler: Handler = async (event) => {
   if (!event.body) {
-    return {
-      statusCode: 500,
-      body: 'error',
-    };
+    return { statusCode: 500, body: 'invalid payload' };
   }
 
   const body = parse(event.body);
   const payload = JSON.parse(body.payload as string);
   const values = payload.view.state.values;
 
-  console.log(JSON.stringify(payload));
-
+  // simplify the data from Slack a bit
   const data = {
     title: values.title_block.title.value,
     date: values.date_block.date.selected_date,
     description: values.description_block.description.value,
-    urgency: values.urgency_block.urgency.selected_option,
+    importance: values.importance_block.importance.selected_option,
   };
 
-  console.log(data);
-
-  const properties: any = {
-    Name: {
-      title: [
-        {
-          text: {
-            content: data.title,
-          },
-        },
-      ],
-    },
-    'Submitted By': {
-      rich_text: [
-        {
-          text: {
-            content: `@${payload.user.username}`,
-          },
-        },
-      ],
-    },
+  // set the fields as Notion properties to populate the database entry
+  const props: RequestEntry = {
+    Name: properties.title(data.title),
   };
 
-  const children: object[] = [];
+  // try to find the Notion user using the Slack user's email
+  const slackUser = await slackApi(`users.info?user=${payload.user.id}`);
+  const email = slackUser.user?.profile?.email || false;
+  const notionUser = email ? await getUserByEmail(email) : false;
 
-  if (data.description) {
-    children.push({
-      type: 'paragraph',
-      paragraph: {
-        rich_text: [
-          {
-            type: 'text',
-            text: {
-              content: data.description,
-            },
-          },
-        ],
-      },
-    });
+  if (notionUser && notionUser.id) {
+    props['Submitted By'] = { people: [{ id: notionUser.id }] };
   }
 
   if (data.date) {
-    properties['Needed By'] = {
-      date: {
-        start: data.date,
-      },
-    };
+    props['Needed By'] = properties.date(data.date);
   }
 
-  if (data.urgency?.text?.text) {
-    properties.Urgency = {
-      select: {
-        name: data.urgency.text.text,
-      },
-    };
+  if (data.importance?.text?.text) {
+    props['How big is the risk to Netlify if we don’t do this?'] =
+      properties.select(data.importance.text.text);
   }
 
-  const notion = await fetch('https://api.notion.com/v1/pages', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Notion-Version': '2022-06-28',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.NOTION_INTEGRATION_TOKEN}`,
-    },
-    body: JSON.stringify({
-      parent: { database_id: '29f4a66d910f43a9b70b4c7eda097187' },
-      properties,
-      children,
-    }),
-  }).then((res) => res.json());
+  // if a description was set, add it as the page content
+  const children: object[] = [];
 
-  console.log(JSON.stringify(notion, null, 2));
+  if (data.description) {
+    children.push(blocks.paragraph(data.description));
+  }
+
+  // create the request in Notion
+  const notionRes = await notionApi('/pages', {
+    parent: { database_id: process.env.NOTION_DB_ID },
+    properties: props,
+    children,
+  });
+
+  if (notionRes.object === 'error') {
+    console.log(notionRes);
+  }
+
+  // build a permalink to the new request
+  const requestLink = new URL('https://www.notion.so/');
+  requestLink.pathname = `/${process.env.NOTION_DB_ID}`;
+  requestLink.searchParams.set('p', notionRes.id.replace(/-/g, ''));
+  requestLink.searchParams.set('pm', 's');
+
+  // send a note to Slack so the team knows a new request has been sent
+  await slackApi('chat.postMessage', {
+    channel: process.env.SLACK_CHANNEL_ID,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `A <${requestLink.toString()}|new DXE request> was created by <@${
+            payload.user.id
+          }>.`,
+        },
+      },
+    ],
+  });
 
   return {
     statusCode: 200,
