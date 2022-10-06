@@ -12,6 +12,45 @@ export const handler: Handler = async (event) => {
 
   const body = parse(event.body);
   const payload = JSON.parse(body.payload as string);
+
+  if (payload.callback_id === 'nudge_shortcut') {
+    console.log(payload);
+
+    const userId = payload.message.user;
+    const msg = `Hey <@${userId}>, in order to make sure we don’t lose track of any requests, we ask that everyone use the \`/dxe-request\` Slack command to submit ideas.`;
+
+    const ts = payload.message.thread_ts ?? payload.message.ts;
+
+    await slackApi('chat.postMessage', {
+      channel: process.env.SLACK_CHANNEL_ID,
+      thread_ts: ts,
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: msg,
+          },
+        },
+        { type: 'divider' },
+        {
+          type: 'context',
+          elements: [
+            {
+              type: 'mrkdwn',
+              text: `If you prefer, you can also submit directly to <https://www.notion.so/jlengstorf/${process.env.NOTION_DB_ID}|our requests Notion database>.`,
+            },
+          ],
+        },
+      ],
+    });
+
+    return {
+      statusCode: 200,
+      body: '',
+    };
+  }
+
   const values = payload.view.state.values;
 
   // simplify the data from Slack a bit
