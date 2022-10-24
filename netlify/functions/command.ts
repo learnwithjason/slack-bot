@@ -203,10 +203,40 @@ export const handler: Handler = async (event) => {
             multiline: true,
             placeholder: {
               type: "plain_text",
-              text: "Example: Links to project plans, background, context, etc.",
+              text: "Add more details about your hype",
             },
           },
           optional: true,
+        },
+        {
+          block_id: "sharing_block",
+          type: "input",
+          element: {
+            type: "checkboxes",
+            options: [
+              {
+                text: {
+                  type: "plain_text",
+                  text: "Share on Slack in #channel",
+                  emoji: true,
+                },
+                value: "slack",
+              },
+              {
+                text: {
+                  type: "plain_text",
+                  text: "Add to your Public Page",
+                  emoji: true,
+                },
+                value: "publicPage",
+              },
+            ],
+          },
+          label: {
+            type: "plain_text",
+            text: "Select how you'd like to share your Hype:",
+            emoji: true,
+          },
         },
       ],
     },
