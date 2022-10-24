@@ -1,6 +1,7 @@
 import type { Handler } from "@netlify/functions";
 import { parse } from "querystring";
 // import { notionApi } from "./utils/notion";
+import { getUser, createHype } from "./utils/db";
 import { slackApi } from "./utils/slack";
 
 export const handler: Handler = async (event) => {
@@ -11,8 +12,15 @@ export const handler: Handler = async (event) => {
     };
   }
 
+  console.log(`${JSON.stringify(event.body)}`);
+
   const body = parse(event.body);
   const { trigger_id } = body;
+
+  // TODO(aashni): UPDATE TO GET ACTUAL UID - this is for contact+t001@aashni.me
+  const FAKE_FIREBASE_UID = "iztpwnEC3lQUqAgvbsBVGQAys382";
+  const hypeUser = await getUser(FAKE_FIREBASE_UID);
+  console.log(`hypeUser: ${JSON.stringify(hypeUser)}`);
 
   // load dropdown options from Notion
   // const dbData = await notionApi(`/databases/${process.env.NOTION_DB_ID}`);
