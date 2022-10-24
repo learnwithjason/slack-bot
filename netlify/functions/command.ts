@@ -1,7 +1,7 @@
 import type { Handler } from "@netlify/functions";
 import { parse } from "querystring";
 // import { notionApi } from "./utils/notion";
-import { getUser, createHype } from "./utils/db";
+import { getUserByEmail, getUser, createHype } from "./utils/db";
 import { slackApi } from "./utils/slack";
 
 export const handler: Handler = async (event) => {
@@ -12,65 +12,20 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  console.log(`${JSON.stringify(event.body)}`);
-
   const body = parse(event.body);
   const { trigger_id } = body;
 
   // TODO(aashni): UPDATE TO GET ACTUAL UID - this is for contact+t001@aashni.me
   const FAKE_FIREBASE_UID = "iztpwnEC3lQUqAgvbsBVGQAys382";
-  const hypeUser = await getUser(FAKE_FIREBASE_UID);
+
+  const slackUser = await slackApi(`users.info?user=${body.user_id}`);
+  const email = slackUser.user?.profile?.email || false;
+
+  console.log(`>> found email address: ${email}`);
+
+  // TODO(aashni): add a check - if no user found, throw an error
+  const hypeUser = await getUserByEmail(email);
   console.log(`hypeUser: ${JSON.stringify(hypeUser)}`);
-
-  // load dropdown options from Notion
-  // const dbData = await notionApi(`/databases/${process.env.NOTION_DB_ID}`);
-  // const options = dbData.properties[
-  //   "How big is the risk to Netlify if we don’t do this?"
-  // ].select.options.map((option) => {
-  //   return {
-  //     text: {
-  //       type: "plain_text",
-  //       text: option.name,
-  //     },
-  //     value: option.name,
-  //   };
-  // });
-
-  // console.log(options);
-  // const optionsTest = [
-  //   {
-  //     text: {
-  //       type: "plain_text",
-  //       text: "option 1",
-  //     },
-  //     value: "value 1",
-  //   },
-  //   {
-  //     text: {
-  //       type: "plain_text",
-  //       text: "option 2",
-  //     },
-  //     value: "value 2",
-  //   },
-  //   {
-  //     text: {
-  //       type: "plain_text",
-  //       text: "option 3",
-  //     },
-  //     value: "value 3",
-  //   },
-  //   {
-  //     text: {
-  //       type: "plain_text",
-  //       text: "option 4",
-  //     },
-  //     value: "value 4",
-  //   },
-  // ];
-
-  // const options = optionsTest.map((option) => {
-  //   return { option };
-  // });
 
   const categoryOptions = [
     {
