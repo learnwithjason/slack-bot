@@ -27,11 +27,6 @@ export const getCategoryName = (categoryValue) => {
   return category ? category.title : "Category not found";
 };
 
-export const getCategoryColor = (categoryValue) => {
-  let category = categories.find((c) => c.value === categoryValue);
-  return category ? category.color : colors.PURPLE;
-};
-
 export const getCategoriesForSlack = () => {
   const categoryOptions = categories.map((category) => {
     return {
