@@ -3,7 +3,10 @@ import { parse } from "querystring";
 import { getUserByEmail, getUser, createHype } from "./utils/db";
 import { getCategoriesForSlack } from "./utils/enums";
 import { slackApi } from "./utils/slack";
-import { getUserEmailFromSlack } from "./utils/user";
+import {
+  getUserEmailFromSlack,
+  getUserGoalOptionsFromFirebase,
+} from "./utils/user";
 
 export const handler: Handler = async (event) => {
   if (!event.body) {
@@ -24,24 +27,7 @@ export const handler: Handler = async (event) => {
 
   const categoryOptions = getCategoriesForSlack();
 
-  const goalOptions = [
-    {
-      text: {
-        type: "plain_text",
-        text: "goal 1",
-        emoji: true,
-      },
-      value: "goal-1",
-    },
-    {
-      text: {
-        type: "plain_text",
-        text: "goal 2",
-        emoji: true,
-      },
-      value: "goal-2",
-    },
-  ];
+  const goalOptions = await getUserGoalOptionsFromFirebase(hypeUser[0].uid);
 
   const res = await slackApi("views.open", {
     trigger_id,

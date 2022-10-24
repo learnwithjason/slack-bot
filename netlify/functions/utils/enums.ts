@@ -39,7 +39,5 @@ export const getCategoriesForSlack = () => {
     };
   });
 
-  console.log(`categoryOptions: ${JSON.stringify(categoryOptions)}`);
-
   return categoryOptions;
 };

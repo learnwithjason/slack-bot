@@ -24,6 +24,14 @@ export const getUserByEmail = async (email) => {
     .then(format);
 };
 
+export const getUserGoals = async (uid) => {
+  return firestore
+    .collection("goals")
+    .where("user_id", "==", uid)
+    .get()
+    .then(format);
+};
+
 //helper function
 // Format Firestore response (handles a collection or single doc)
 function format(response) {
