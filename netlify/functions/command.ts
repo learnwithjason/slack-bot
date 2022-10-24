@@ -22,7 +22,6 @@ export const handler: Handler = async (event) => {
   const email = await getUserEmailFromSlack(body.user_id);
 
   const hypeUser = await getUserByEmail(email);
-  console.log(`hypeUser: ${JSON.stringify(hypeUser)}`);
   // TODO(aashni): add a check - if no user found, throw an error
 
   const categoryOptions = getCategoriesForSlack();

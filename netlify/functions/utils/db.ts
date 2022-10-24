@@ -3,8 +3,6 @@ import { firebaseAdmin } from "./firebase";
 const firestore = firebaseAdmin.firestore();
 
 export const createHype = async (hypeData) => {
-  console.log(`inside createHype, hypeData:`);
-  console.log(hypeData, null, 2);
   return firestore.collection("hypeEvents").add(hypeData);
 };
 

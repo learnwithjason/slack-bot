@@ -1,6 +1,6 @@
-import type { RequestInit } from 'node-fetch';
-import { Client, collectPaginatedAPI } from '@notionhq/client';
-import fetch from 'node-fetch';
+import type { RequestInit } from "node-fetch";
+import { Client, collectPaginatedAPI } from "@notionhq/client";
+import fetch from "node-fetch";
 
 const notion = new Client({
   auth: process.env.NOTION_INTEGRATION_TOKEN,
@@ -12,14 +12,12 @@ export async function getUserByEmail(email) {
   });
 
   const user = users.find((u) => {
-    if (u.type !== 'person') {
+    if (u.type !== "person") {
       return false;
     }
 
     return u.person.email === email;
   });
-
-  console.log(user);
 
   return user;
 }
@@ -31,9 +29,9 @@ type TitleProperty = {
 type RichTextProperty = {
   rich_text: [
     {
-      type: 'text';
+      type: "text";
       text: { content: string };
-    },
+    }
   ];
 };
 
@@ -51,34 +49,34 @@ type SelectProperty = {
 
 export type RequestEntry = {
   Name: TitleProperty;
-  'Submitted By'?: PeopleProperty;
-  'Needed By'?: DateProperty;
-  'How big is the risk to Netlify if we don’t do this?'?: SelectProperty;
+  "Submitted By"?: PeopleProperty;
+  "Needed By"?: DateProperty;
+  "How big is the risk to Netlify if we don’t do this?"?: SelectProperty;
 };
 
 type ParagraphBlock = {
-  type: 'paragraph';
+  type: "paragraph";
   paragraph: RichTextProperty;
 };
 
 export async function notionApi(endpoint: string, body?: object) {
   const options: RequestInit = {
-    method: 'GET',
+    method: "GET",
     headers: {
-      Accept: 'application/json',
-      'Notion-Version': '2022-06-28',
-      'Content-Type': 'application/json',
+      Accept: "application/json",
+      "Notion-Version": "2022-06-28",
+      "Content-Type": "application/json",
       Authorization: `Bearer ${process.env.NOTION_INTEGRATION_TOKEN}`,
     },
   };
 
   if (body) {
-    options.method = 'POST';
+    options.method = "POST";
     options.body = JSON.stringify(body);
   }
 
   return await fetch(`https://api.notion.com/v1${endpoint}`, options).then(
-    (res) => res.json(),
+    (res) => res.json()
   );
 }
 
@@ -98,7 +96,7 @@ export const properties = {
     return {
       rich_text: [
         {
-          type: 'text',
+          type: "text",
           text: { content },
         },
       ],
@@ -123,7 +121,7 @@ export const properties = {
 export const blocks = {
   paragraph(content): ParagraphBlock {
     return {
-      type: 'paragraph',
+      type: "paragraph",
       paragraph: properties.richText(content),
     };
   },
