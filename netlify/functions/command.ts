@@ -1,8 +1,9 @@
 import type { Handler } from "@netlify/functions";
 import { parse } from "querystring";
-// import { notionApi } from "./utils/notion";
 import { getUserByEmail, getUser, createHype } from "./utils/db";
+import { getCategoriesForSlack } from "./utils/enums";
 import { slackApi } from "./utils/slack";
+import { getUserEmailFromSlack } from "./utils/user";
 
 export const handler: Handler = async (event) => {
   if (!event.body) {
@@ -15,36 +16,13 @@ export const handler: Handler = async (event) => {
   const body = parse(event.body);
   const { trigger_id } = body;
 
-  // TODO(aashni): UPDATE TO GET ACTUAL UID - this is for contact+t001@aashni.me
-  const FAKE_FIREBASE_UID = "iztpwnEC3lQUqAgvbsBVGQAys382";
+  const email = await getUserEmailFromSlack(body.user_id);
 
-  const slackUser = await slackApi(`users.info?user=${body.user_id}`);
-  const email = slackUser.user?.profile?.email || false;
-
-  console.log(`>> found email address: ${email}`);
-
-  // TODO(aashni): add a check - if no user found, throw an error
   const hypeUser = await getUserByEmail(email);
   console.log(`hypeUser: ${JSON.stringify(hypeUser)}`);
+  // TODO(aashni): add a check - if no user found, throw an error
 
-  const categoryOptions = [
-    {
-      text: {
-        type: "plain_text",
-        text: "category 1",
-        emoji: true,
-      },
-      value: "category-1",
-    },
-    {
-      text: {
-        type: "plain_text",
-        text: "category 2",
-        emoji: true,
-      },
-      value: "category-2",
-    },
-  ];
+  const categoryOptions = getCategoriesForSlack();
 
   const goalOptions = [
     {
