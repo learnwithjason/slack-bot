@@ -35,7 +35,7 @@ export const getCategoriesForSlack = () => {
         text: category.title,
         emoji: true,
       },
-      value: category.title,
+      value: category.value,
     };
   });
 

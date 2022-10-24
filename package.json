@@ -17,6 +17,7 @@
     "firebase": "^9.12.1",
     "firebase-admin": "^11.2.0",
     "netlify-cli": "^11.8.1",
-    "node-fetch": "^3.2.10"
+    "node-fetch": "^3.2.10",
+    "uuidv4": "^6.2.13"
   }
 }

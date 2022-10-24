@@ -138,8 +138,10 @@ export const handler: Handler = async (event) => {
         {
           block_id: "sharing_block",
           type: "input",
+          optional: true,
           element: {
             type: "checkboxes",
+            action_id: "sharing",
             options: [
               {
                 text: {

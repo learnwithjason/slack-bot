@@ -1,4 +1,4 @@
-import { getUserGoals } from "./db";
+import { getUserGoals, getUserByEmail } from "./db";
 import { slackApi } from "./slack";
 
 export const getUserEmailFromSlack = async (user_id) => {
@@ -8,6 +8,15 @@ export const getUserEmailFromSlack = async (user_id) => {
   console.log(`>> found email address: ${email}`);
 
   return email;
+};
+
+export const getFirebaseUserFromSlackUser = async (user_id) => {
+  console.log(`getFirebaseUserFromSlackUser, user_id: ${user_id}`);
+  const slackEmail = await getUserEmailFromSlack(user_id);
+  console.log(`slackEmail: ${slackEmail}`);
+  const firebaseUser = !!slackEmail ? await getUserByEmail(slackEmail) : {};
+  console.log(`firebaseUser found? ${JSON.stringify(firebaseUser)}`);
+  return firebaseUser;
 };
 
 export const getUserGoalOptionsFromFirebase = async (user_id) => {
