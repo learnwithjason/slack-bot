@@ -64,26 +64,43 @@ export const handler: Handler = async (event) => {
   //   return { option };
   // });
 
-  const options = [
+  const categoryOptions = [
     {
       text: {
         type: "plain_text",
-        text: "option 0",
+        text: "category 1",
         emoji: true,
       },
-      value: "value-0",
+      value: "category-1",
     },
     {
       text: {
         type: "plain_text",
-        text: "option 1",
+        text: "category 2",
         emoji: true,
       },
-      value: "value-1",
+      value: "category-2",
     },
   ];
 
-  console.log(`options: ${JSON.stringify(options)}`);
+  const goalOptions = [
+    {
+      text: {
+        type: "plain_text",
+        text: "goal 1",
+        emoji: true,
+      },
+      value: "goal-1",
+    },
+    {
+      text: {
+        type: "plain_text",
+        text: "goal 2",
+        emoji: true,
+      },
+      value: "goal-2",
+    },
+  ];
 
   const res = await slackApi("views.open", {
     trigger_id,
@@ -146,17 +163,31 @@ export const handler: Handler = async (event) => {
           },
         },
         {
-          block_id: "importance_block",
+          block_id: "category_block",
           type: "input",
           label: {
             type: "plain_text",
-            text: "How big is the risk to Netlify if we don’t do this?",
+            text: "How do you categorize this Hype?",
           },
           element: {
-            action_id: "importance",
+            action_id: "category",
             type: "static_select",
-            options,
-            initial_option: options[0],
+            options: categoryOptions,
+            initial_option: categoryOptions[0],
+          },
+        },
+        {
+          block_id: "goal_block",
+          type: "input",
+          label: {
+            type: "plain_text",
+            text: "Is this related to any of your goals?",
+          },
+          element: {
+            action_id: "goal",
+            type: "static_select",
+            options: goalOptions,
+            initial_option: goalOptions[0],
           },
         },
         {
