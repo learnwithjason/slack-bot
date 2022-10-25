@@ -1,5 +1,5 @@
 import { getUserGoals, getUserByEmail } from "./db";
-import { SLACK_ACTIONS } from "./enums";
+import { goalStates, SLACK_ACTIONS } from "./enums";
 import { slackApi } from "./slack";
 
 export const getActionFromText = (text) => {
@@ -126,8 +126,15 @@ export const formatGoalsForSlackMessage = async (goals) => {
     return listGoalMessage;
   }
 
+  // :large_purple_circle: :large_green_circle:
+
   let messageList = goals.map(
-    (goal, key) => `${key + 1}. *${goal.title}* - ${goal.description}`
+    (goal) =>
+      `${
+        goal.status === goalStates.COMPLETE
+          ? `:large_green_circle:`
+          : `:large_purple_circle:`
+      }. *${goal.title}* - <https://hypedocs.co/goal/${goal.id}|see progress>`
   );
   listGoalMessage = listGoalMessage + "\n\n" + messageList.join("\n");
 
