@@ -26,20 +26,35 @@ export const handler: Handler = async (event) => {
   }
 
   const body = parse(event.body);
-  const { text } = body;
+  const { text, user_id } = body;
+
+  // check if user exists
+  const email = await getUserEmailFromSlack(user_id);
+  const hypeUser = await getUserByEmail(email);
+
+  if (hypeUser.length < 1) {
+    // user doesn't exist
+    await userNotFoundCommand(body);
+
+    return {
+      statusCode: 200,
+      body: "User Not Found",
+    };
+  }
+  // TODO(aashni): add a check - if no user found, throw an error
 
   let action = getActionFromText(text);
 
   let res = {};
 
   if (action === SLACK_ACTIONS.ADD_HYPE) {
-    res = addHypeCommand(body);
+    res = addHypeCommand(body, hypeUser);
   } else if (action === SLACK_ACTIONS.ADD_GOAL) {
     res = addGoalCommand(body);
   } else if (action === SLACK_ACTIONS.LIST_HYPE) {
-    res = listHypeCommand(body);
+    res = listHypeCommand(body, hypeUser[0]);
   } else if (action === SLACK_ACTIONS.LIST_GOAL) {
-    res = listGoalCommand(body);
+    res = listGoalCommand(body, hypeUser[0]);
   } else {
     return {
       // TODO(aashni): check what the error code options are
@@ -56,12 +71,81 @@ export const handler: Handler = async (event) => {
 };
 
 // HELPER FUNCTIONS
-const addHypeCommand = async (body) => {
-  const { trigger_id, user_id, text } = body;
+const userNotFoundCommand = async (body) => {
+  const { trigger_id } = body;
 
-  const email = await getUserEmailFromSlack(user_id);
-  const hypeUser = await getUserByEmail(email);
-  // TODO(aashni): add a check - if no user found, throw an error
+  const res = await slackApi("views.open", {
+    trigger_id,
+    view: {
+      type: "modal",
+      title: {
+        type: "plain_text",
+        text: "Account Not Found",
+      },
+      callback_id: "user-not-found",
+      blocks: [
+        {
+          type: "header",
+          text: {
+            type: "plain_text",
+            text: "Your HypeDocs Account Can't Be Found",
+            emoji: true,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "We couldn't find a HypeDocs account associated with your email <email>.",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "You can create an account easily through the web. In partnership with <CommunityName> you can use `<DiscountCode>` for a <DiscountAmount> discount.",
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Create an Account",
+              emoji: true,
+            },
+            value: "create_an_account",
+            url: "https://hypedocs.co/auth/signup",
+            action_id: "button-action",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "If this sounds like a mistake, get in touch with us and we'll get things sorted out!",
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Email Us",
+              emoji: true,
+            },
+            value: "contact_us",
+            url: "mailto:contact@hypedocs.co",
+            action_id: "button-action",
+          },
+        },
+      ],
+    },
+  });
+
+  console.log(res);
+
+  return res;
+};
+
+const addHypeCommand = async (body, hypeUser) => {
+  const { trigger_id } = body;
 
   const categoryOptions = getCategoriesForSlack();
   const goalOptions = await getUserGoalOptionsFromFirebase(hypeUser[0].uid);
@@ -215,12 +299,7 @@ const addHypeCommand = async (body) => {
 };
 
 const addGoalCommand = async (body) => {
-  const { trigger_id, user_id, text } = body;
-
-  // TODO(aashni): do the user validation check before coming into the individual commands
-  const email = await getUserEmailFromSlack(user_id);
-  const hypeUser = await getUserByEmail(email);
-  // TODO(aashni): add a check - if no user found, throw an error
+  const { trigger_id } = body;
 
   const res = await slackApi("views.open", {
     trigger_id,
@@ -315,15 +394,10 @@ const addGoalCommand = async (body) => {
   return res;
 };
 
-const listHypeCommand = async (body) => {
-  const { trigger_id, user_id, text } = body;
+const listHypeCommand = async (body, hypeUser) => {
+  const { user_id } = body;
 
-  // TODO(aashni): do the user validation check before coming into the individual commands
-  const email = await getUserEmailFromSlack(user_id);
-  const hypeUser = await getUserByEmail(email);
-  // TODO(aashni): add a check - if no user found, throw an error
-
-  const userHypes = await getUserHypes(hypeUser[0].uid);
+  const userHypes = await getUserHypes(hypeUser.uid);
 
   const slackMessage = await formatHypesForSlackMessage(userHypes);
 
@@ -346,15 +420,10 @@ const listHypeCommand = async (body) => {
   };
 };
 
-const listGoalCommand = async (body) => {
+const listGoalCommand = async (body, hypeUser) => {
   const { trigger_id, user_id, text } = body;
 
-  // TODO(aashni): do the user validation check before coming into the individual commands
-  const email = await getUserEmailFromSlack(user_id);
-  const hypeUser = await getUserByEmail(email);
-  // TODO(aashni): add a check - if no user found, throw an error
-
-  const userHypes = await getUserGoals(hypeUser[0].uid);
+  const userHypes = await getUserGoals(hypeUser.uid);
 
   const slackMessage = await formatGoalsForSlackMessage(userHypes);
 
