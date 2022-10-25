@@ -32,8 +32,6 @@ export const getActionFromText = (text) => {
     action = SLACK_ACTIONS.ACTION_ERROR;
   }
 
-  console.log(`action before return: ${action}`);
-
   return action;
 };
 
@@ -45,7 +43,6 @@ export const getActionFromCallback = (callback) => {
   }
 
   const words = callback.split("-");
-  console.log(`words: ${JSON.stringify(words)}`);
 
   if (words[0] === "new") {
     action =
@@ -68,8 +65,6 @@ export const getActionFromCallback = (callback) => {
   } else {
     action = SLACK_ACTIONS.ACTION_ERROR;
   }
-
-  console.log(`action before return: ${action}`);
 
   return action;
 };

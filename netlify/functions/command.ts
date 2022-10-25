@@ -20,10 +20,7 @@ export const handler: Handler = async (event) => {
   const body = parse(event.body);
   const { text } = body;
 
-  console.log(body, null, 2);
-
   let action = getActionFromText(text);
-  console.log(`action: ${action}`);
 
   let res = {};
 

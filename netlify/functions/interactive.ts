@@ -15,7 +15,6 @@ export const handler: Handler = async (event) => {
 
   const body = parse(event.body);
   const payload = JSON.parse(body.payload as string);
-  console.log(payload, null, 2);
 
   const action = getActionFromCallback(payload.view.callback_id);
   let res = {};
