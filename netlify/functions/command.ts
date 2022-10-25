@@ -1,9 +1,16 @@
 import type { Handler } from "@netlify/functions";
 import { parse } from "querystring";
-import { getUserByEmail, getUser, createHype, getUserHypes } from "./utils/db";
+import {
+  getUserByEmail,
+  getUser,
+  createHype,
+  getUserHypes,
+  getUserGoals,
+} from "./utils/db";
 import { getCategoriesForSlack, SLACK_ACTIONS } from "./utils/enums";
 import { slackApi } from "./utils/slack";
 import {
+  formatGoalsForSlackMessage,
   formatHypesForSlackMessage,
   getActionFromText,
   getUserEmailFromSlack,
@@ -31,6 +38,8 @@ export const handler: Handler = async (event) => {
     res = addGoalCommand(body);
   } else if (action === SLACK_ACTIONS.LIST_HYPE) {
     res = listHypeCommand(body);
+  } else if (action === SLACK_ACTIONS.LIST_GOAL) {
+    res = listGoalCommand(body);
   } else {
     return {
       // TODO(aashni): check what the error code options are
@@ -317,6 +326,37 @@ const listHypeCommand = async (body) => {
   const userHypes = await getUserHypes(hypeUser[0].uid);
 
   const slackMessage = await formatHypesForSlackMessage(userHypes);
+
+  await slackApi("chat.postMessage", {
+    channel: process.env.SLACK_CHANNEL_ID,
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: slackMessage,
+        },
+      },
+    ],
+  });
+
+  return {
+    statusCode: 200,
+    body: "",
+  };
+};
+
+const listGoalCommand = async (body) => {
+  const { trigger_id, user_id, text } = body;
+
+  // TODO(aashni): do the user validation check before coming into the individual commands
+  const email = await getUserEmailFromSlack(user_id);
+  const hypeUser = await getUserByEmail(email);
+  // TODO(aashni): add a check - if no user found, throw an error
+
+  const userHypes = await getUserGoals(hypeUser[0].uid);
+
+  const slackMessage = await formatGoalsForSlackMessage(userHypes);
 
   await slackApi("chat.postMessage", {
     channel: process.env.SLACK_CHANNEL_ID,
