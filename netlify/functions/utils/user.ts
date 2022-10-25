@@ -12,20 +12,20 @@ export const getActionFromText = (text) => {
   const words = text.split(" ");
   if (words[0] === "add") {
     action =
-      words[1] === "hype"
+      words[1] === "hype" || words[1] === "hypes"
         ? SLACK_ACTIONS.ADD_HYPE
-        : words[1] === "goals" || words[1] === "goal"
+        : words[1] === "goal" || words[1] === "goals"
         ? SLACK_ACTIONS.ADD_GOAL
-        : words[1] === "challenge"
+        : words[1] === "challenge" || words[1] === "challenges"
         ? SLACK_ACTIONS.ADD_CHALLENGE
         : SLACK_ACTIONS.ACTION_ERROR;
   } else if (words[0] === "list") {
     action =
-      words[1] === "hype"
+      words[1] === "hype" || words[1] === "hypes"
         ? SLACK_ACTIONS.LIST_HYPE
-        : words[1] === "goals" || words[1] === "goal"
+        : words[1] === "goal" || words[1] === "goals"
         ? SLACK_ACTIONS.LIST_GOAL
-        : words[1] === "challenge"
+        : words[1] === "challenge" || words[1] === "challenges"
         ? SLACK_ACTIONS.LIST_CHALLENGE
         : SLACK_ACTIONS.ACTION_ERROR;
   } else {
