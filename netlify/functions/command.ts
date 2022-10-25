@@ -71,8 +71,15 @@ export const handler: Handler = async (event) => {
 };
 
 // HELPER FUNCTIONS
-const userNotFoundCommand = async (body) => {
+const userNotFoundCommand = async (body, email) => {
   const { trigger_id } = body;
+
+  let createAnAccountText = `You can create an account easily through the web.`;
+
+  // TODO(aashni): check if slack is part of our business accounts / have a partnership code / something here
+  if (false) {
+    createAnAccountText = `${createAnAccountText} In partnership with <CommunityName> you can use \`<DiscountCode>\` for a <DiscountAmount> discount.`;
+  }
 
   const res = await slackApi("views.open", {
     trigger_id,
@@ -96,14 +103,14 @@ const userNotFoundCommand = async (body) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "We couldn't find a HypeDocs account associated with your email <email>.",
+            text: `We couldn't find a HypeDocs account associated with your email ${email}.`,
           },
         },
         {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "You can create an account easily through the web. In partnership with <CommunityName> you can use `<DiscountCode>` for a <DiscountAmount> discount.",
+            text: createAnAccountText,
           },
           accessory: {
             type: "button",
@@ -121,7 +128,7 @@ const userNotFoundCommand = async (body) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "If this sounds like a mistake, get in touch with us and we'll get things sorted out!",
+            text: "If this sounds like a mistake, get in touch with us and we'll help you!",
           },
           accessory: {
             type: "button",
