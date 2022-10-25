@@ -22,6 +22,17 @@ export const categories = [
   },
 ];
 
+export const SLACK_ACTIONS = {
+  ADD_HYPE: "ADD_HYPE",
+  ADD_GOAL: "ADD_GOAL",
+  ADD_CHALLENGE: "ADD_CHALLENGE",
+  LIST_HYPE: "LIST_HYPE",
+  LIST_GOAL: "LIST_GOAL",
+  LIST_CHALLENGE: "LIST_CHALLENGE",
+  NO_ACTION: "NO_ACTION",
+  ACTION_ERROR: "ACTION_ERROR",
+};
+
 export const getCategoryName = (categoryValue) => {
   let category = categories.find((c) => c.value === categoryValue);
   return category ? category.title : "Category not found";

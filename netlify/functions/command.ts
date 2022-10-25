@@ -1,9 +1,10 @@
 import type { Handler } from "@netlify/functions";
 import { parse } from "querystring";
 import { getUserByEmail, getUser, createHype } from "./utils/db";
-import { getCategoriesForSlack } from "./utils/enums";
+import { getCategoriesForSlack, SLACK_ACTIONS } from "./utils/enums";
 import { slackApi } from "./utils/slack";
 import {
+  getActionFromText,
   getUserEmailFromSlack,
   getUserGoalOptionsFromFirebase,
 } from "./utils/user";
@@ -17,15 +18,41 @@ export const handler: Handler = async (event) => {
   }
 
   const body = parse(event.body);
-  const { trigger_id } = body;
+  const { text } = body;
 
-  const email = await getUserEmailFromSlack(body.user_id);
+  console.log(body, null, 2);
 
+  let action = getActionFromText(text);
+  console.log(`action: ${action}`);
+
+  let res = {};
+
+  if (action === SLACK_ACTIONS.ADD_HYPE) {
+    res = addHypeCommand(body);
+  } else {
+    return {
+      // TODO(aashni): check what the error code options are
+      statusCode: 404,
+      body: "Command usage incorrect. Try again",
+    };
+  }
+
+  // TODO(aashni): Check if res has any errors, otherwise return 200
+  return {
+    statusCode: 200,
+    body: "",
+  };
+};
+
+// HELPER FUNCTIONS
+const addHypeCommand = async (body) => {
+  const { trigger_id, user_id, text } = body;
+
+  const email = await getUserEmailFromSlack(user_id);
   const hypeUser = await getUserByEmail(email);
   // TODO(aashni): add a check - if no user found, throw an error
 
   const categoryOptions = getCategoriesForSlack();
-
   const goalOptions = await getUserGoalOptionsFromFirebase(hypeUser[0].uid);
 
   const res = await slackApi("views.open", {
@@ -63,7 +90,8 @@ export const handler: Handler = async (event) => {
               type: "plain_text",
               text: "I launched a new feature",
             },
-            initial_value: body.text,
+            // TODO(aashni): set an initial value using the title
+            initial_value: "",
           },
           hint: {
             type: "plain_text",
@@ -171,9 +199,4 @@ export const handler: Handler = async (event) => {
   });
 
   console.log(res);
-
-  return {
-    statusCode: 200,
-    body: "",
-  };
 };
