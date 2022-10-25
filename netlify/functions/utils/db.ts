@@ -36,6 +36,14 @@ export const getUserGoals = async (uid) => {
     .then(format);
 };
 
+export const getUserHypes = async (uid) => {
+  return firestore
+    .collection("hypeEvents")
+    .where("user_id", "==", uid)
+    .get()
+    .then(format);
+};
+
 //helper function
 // Format Firestore response (handles a collection or single doc)
 function format(response) {
