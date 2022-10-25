@@ -14,7 +14,7 @@ export const getActionFromText = (text) => {
     action =
       words[1] === "hype"
         ? SLACK_ACTIONS.ADD_HYPE
-        : words[1] === "goals"
+        : words[1] === "goals" || words[1] === "goal"
         ? SLACK_ACTIONS.ADD_GOAL
         : words[1] === "challenge"
         ? SLACK_ACTIONS.ADD_CHALLENGE
@@ -23,7 +23,7 @@ export const getActionFromText = (text) => {
     action =
       words[1] === "hype"
         ? SLACK_ACTIONS.LIST_HYPE
-        : words[1] === "goals"
+        : words[1] === "goals" || words[1] === "goal"
         ? SLACK_ACTIONS.LIST_GOAL
         : words[1] === "challenge"
         ? SLACK_ACTIONS.LIST_CHALLENGE
@@ -31,6 +31,45 @@ export const getActionFromText = (text) => {
   } else {
     action = SLACK_ACTIONS.ACTION_ERROR;
   }
+
+  console.log(`action before return: ${action}`);
+
+  return action;
+};
+
+export const getActionFromCallback = (callback) => {
+  let action = "";
+
+  if (callback === "" || callback === undefined) {
+    action = SLACK_ACTIONS.NO_ACTION;
+  }
+
+  const words = callback.split("-");
+  console.log(`words: ${JSON.stringify(words)}`);
+
+  if (words[0] === "new") {
+    action =
+      words[1] === "hype"
+        ? SLACK_ACTIONS.ADD_HYPE
+        : words[1] === "goals" || words[1] === "goal"
+        ? SLACK_ACTIONS.ADD_GOAL
+        : words[1] === "challenge"
+        ? SLACK_ACTIONS.ADD_CHALLENGE
+        : SLACK_ACTIONS.ACTION_ERROR;
+  } else if (words[0] === "list") {
+    action =
+      words[1] === "hype"
+        ? SLACK_ACTIONS.LIST_HYPE
+        : words[1] === "goals" || words[1] === "goal"
+        ? SLACK_ACTIONS.LIST_GOAL
+        : words[1] === "challenge"
+        ? SLACK_ACTIONS.LIST_CHALLENGE
+        : SLACK_ACTIONS.ACTION_ERROR;
+  } else {
+    action = SLACK_ACTIONS.ACTION_ERROR;
+  }
+
+  console.log(`action before return: ${action}`);
 
   return action;
 };

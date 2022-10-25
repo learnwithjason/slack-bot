@@ -6,6 +6,10 @@ export const createHype = async (hypeData) => {
   return firestore.collection("hypeEvents").add(hypeData);
 };
 
+export const createGoal = async (goalData) => {
+  return firestore.collection("goals").add(goalData);
+};
+
 export const getUser = async (uid) => {
   return firestore
     .collection("users")

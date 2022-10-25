@@ -1,6 +1,7 @@
 import { uuid } from "uuidv4";
 import { convertYYYYMMDDToTimestamp, getTodaysDateAsTimestamp } from "./dates";
-import { createHype } from "./db";
+import { createHype, createGoal } from "./db";
+import { goalStates } from "./enums";
 
 export const createNewHype = async (firebaseUser, slackData) => {
   // Checking data input:
@@ -26,6 +27,26 @@ export const createNewHype = async (firebaseUser, slackData) => {
   };
 
   const createHypeResponse = await createHype(hypeData);
+
+  // TODO(aashni): check if the hype was actually added and add some error handling incase it wasn't
+  // TODO(aashni): add some analysis information here
+};
+
+export const createNewGoal = async (firebaseUser, slackData) => {
+  // Checking data input:
+
+  // Getting data:
+  let goalData = {
+    id: uuid(),
+    user_id: firebaseUser.uid,
+    title: slackData.title,
+    date: getTodaysDateAsTimestamp(),
+    description: slackData.description,
+    currentGoalStatus: "ACTIVE_GOAL",
+    goalState: goalStates.PROGRESS,
+  };
+
+  const createGoalResponse = await createGoal(goalData);
 
   // TODO(aashni): check if the hype was actually added and add some error handling incase it wasn't
   // TODO(aashni): add some analysis information here

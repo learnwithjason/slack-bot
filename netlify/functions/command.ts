@@ -29,6 +29,8 @@ export const handler: Handler = async (event) => {
 
   if (action === SLACK_ACTIONS.ADD_HYPE) {
     res = addHypeCommand(body);
+  } else if (action === SLACK_ACTIONS.ADD_GOAL) {
+    res = addGoalCommand(body);
   } else {
     return {
       // TODO(aashni): check what the error code options are
@@ -199,4 +201,107 @@ const addHypeCommand = async (body) => {
   });
 
   console.log(res);
+
+  return res;
+};
+
+const addGoalCommand = async (body) => {
+  const { trigger_id, user_id, text } = body;
+
+  // TODO(aashni): do the user validation check before coming into the individual commands
+  const email = await getUserEmailFromSlack(user_id);
+  const hypeUser = await getUserByEmail(email);
+  // TODO(aashni): add a check - if no user found, throw an error
+
+  const res = await slackApi("views.open", {
+    trigger_id,
+    view: {
+      type: "modal",
+      title: {
+        type: "plain_text",
+        text: "Add a new Goal",
+      },
+      callback_id: "new-goal",
+      submit: {
+        type: "plain_text",
+        text: "Submit",
+      },
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "Fill out this form to add a new Goal to your HypeDoc! Or, if you prefer, you can <https://hypedocs.co|goals add your goal through the browser>.",
+          },
+        },
+        {
+          block_id: "title_block",
+          type: "input",
+          label: {
+            type: "plain_text",
+            text: "What are you working towards?",
+          },
+          element: {
+            action_id: "title",
+            type: "plain_text_input",
+            placeholder: {
+              type: "plain_text",
+              text: "Build a rocket",
+            },
+            // TODO(aashni): set an initial value using the title
+            initial_value: "",
+          },
+          hint: {
+            type: "plain_text",
+            text: "Your 1-liner for your goal",
+          },
+        },
+        {
+          block_id: "description_block",
+          type: "input",
+          label: {
+            type: "plain_text",
+            text: "Additional details",
+          },
+          element: {
+            action_id: "description",
+            type: "plain_text_input",
+            multiline: true,
+            placeholder: {
+              type: "plain_text",
+              text: "Add more details about your goal",
+            },
+          },
+          optional: true,
+        },
+        {
+          block_id: "sharing_block",
+          type: "input",
+          optional: true,
+          element: {
+            type: "checkboxes",
+            action_id: "sharing",
+            options: [
+              {
+                text: {
+                  type: "plain_text",
+                  text: "Share on Slack in #channel",
+                  emoji: true,
+                },
+                value: "slack",
+              },
+            ],
+          },
+          label: {
+            type: "plain_text",
+            text: "Select how you'd like to share your Hype:",
+            emoji: true,
+          },
+        },
+      ],
+    },
+  });
+
+  console.log(res);
+  return res;
 };
