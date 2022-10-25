@@ -1,4 +1,4 @@
-import { uuid } from "uuidv4";
+import { v4 as uuidv4 } from "uuid";
 import { convertYYYYMMDDToTimestamp, getTodaysDateAsTimestamp } from "./dates";
 import { createHype, createGoal } from "./db";
 import { goalStates } from "./enums";
@@ -14,7 +14,7 @@ export const createNewHype = async (firebaseUser, slackData) => {
 
   // Getting data:
   let hypeData = {
-    id: uuid(),
+    id: uuidv4(),
     user_id: firebaseUser.uid,
     title: slackData.title,
     date: getTodaysDateAsTimestamp(),
@@ -37,7 +37,7 @@ export const createNewGoal = async (firebaseUser, slackData) => {
 
   // Getting data:
   let goalData = {
-    id: uuid(),
+    id: uuidv4(),
     user_id: firebaseUser.uid,
     title: slackData.title,
     date: getTodaysDateAsTimestamp(),
