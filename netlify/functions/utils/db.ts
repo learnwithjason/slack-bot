@@ -40,6 +40,8 @@ export const getUserHypes = async (uid) => {
   return firestore
     .collection("hypeEvents")
     .where("user_id", "==", uid)
+    .orderBy("date", "desc")
+    .limitToLast(7)
     .get()
     .then(format);
 };
