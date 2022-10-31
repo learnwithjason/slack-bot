@@ -34,7 +34,7 @@ export const handler: Handler = async (event) => {
 
   if (hypeUser.length < 1) {
     // user doesn't exist
-    await userNotFoundCommand(body);
+    await userNotFoundCommand(body, email);
 
     return {
       statusCode: 200,
