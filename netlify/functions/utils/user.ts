@@ -69,6 +69,27 @@ export const getActionFromCallback = (callback) => {
   return action;
 };
 
+export const getActionFromSubscription = async (subscription) => {
+  let action = "";
+
+  if (subscription === "" || subscription === undefined) {
+    action = SLACK_ACTIONS.NO_ACTION;
+    return action;
+  }
+
+  const words = subscription.split(" ");
+
+  if (words[0] === "url_verification") {
+    action = SLACK_ACTIONS.URL_VERIFICATION;
+  } else if (words[0] === "app_home_opened") {
+    action = SLACK_ACTIONS.APP_HOME_OPENED;
+  } else {
+    action = SLACK_ACTIONS.ACTION_ERROR;
+  }
+
+  return action;
+};
+
 export const getUserEmailFromSlack = async (user_id) => {
   const slackUser = await slackApi(`users.info?user=${user_id}`);
   const email = slackUser.user?.profile?.email || false;
