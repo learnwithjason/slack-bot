@@ -45,19 +45,6 @@ export const handler: Handler = async (event) => {
   //  push hype to firebase
   //  if required, share hype to appropriate channels
 
-  await slackApi("chat.postMessage", {
-    channel: process.env.SLACK_CHANNEL_ID,
-    blocks: [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: `A new hype was created by <@${payload.user.id}>.`,
-        },
-      },
-    ],
-  });
-
   return {
     statusCode: 200,
     body: "",
@@ -126,7 +113,7 @@ const addGoalAction = async (payload) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `<@${payload.user.id}> create a new goal!\n\n*:tada: _${slackData.title}!_ :tada:*\n\n`,
+            text: `<@${payload.user.id}> created a new goal!\n\n*:tada: _${slackData.title}!_ :tada:*\n\n`,
           },
         },
       ],
