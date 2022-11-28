@@ -1,5 +1,6 @@
 import type { Handler } from "@netlify/functions";
 import { parse } from "querystring";
+import { acknowledgeAction } from "./utils/commonMessages";
 import { SLACK_ACTIONS } from "./utils/enums";
 import { createNewHype, createNewGoal } from "./utils/hypes";
 import { slackApi } from "./utils/slack";
@@ -88,6 +89,8 @@ const addHypeAction = async (payload) => {
       ],
     });
   }
+
+  acknowledgeAction(payload.user.id, "achievement", payload.user.id);
 };
 
 const addGoalAction = async (payload) => {
@@ -119,4 +122,6 @@ const addGoalAction = async (payload) => {
       ],
     });
   }
+
+  acknowledgeAction(payload.user.id, "goal", payload.user.id);
 };

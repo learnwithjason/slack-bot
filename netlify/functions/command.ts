@@ -32,6 +32,7 @@ export const handler: Handler = async (event) => {
   const email = await getUserEmailFromSlack(user_id);
   const hypeUser = await getUserByEmail(email);
 
+  // TODO(aashni): add a check - if no user found, throw an error
   if (hypeUser.length < 1) {
     // user doesn't exist
     await userNotFoundCommand(body, email);
@@ -41,7 +42,6 @@ export const handler: Handler = async (event) => {
       body: "User Not Found",
     };
   }
-  // TODO(aashni): add a check - if no user found, throw an error
 
   let action = getActionFromText(text);
 
@@ -55,6 +55,8 @@ export const handler: Handler = async (event) => {
     res = listHypeCommand(body, hypeUser[0]);
   } else if (action === SLACK_ACTIONS.LIST_GOAL) {
     res = listGoalCommand(body, hypeUser[0]);
+  } else if (action === SLACK_ACTIONS.FAKE_CONTENT) {
+    res = postFakeContentCommand(body, hypeUser[0]);
   } else {
     return {
       // TODO(aashni): check what the error code options are
@@ -446,6 +448,41 @@ const listGoalCommand = async (body, hypeUser) => {
       },
     ],
   });
+
+  return {
+    statusCode: 200,
+    body: "",
+  };
+};
+
+const postFakeContentCommand = async (body, hypeUser) => {
+  const { trigger_id, user_id, text } = body;
+
+  const userHypes = await getUserGoals(hypeUser.uid);
+
+  const slackMessage = await formatGoalsForSlackMessage(userHypes);
+
+  await slackApi("chat.postMessage", {
+    // TODO(aashni): need to store individual SLACK_CHANNEL_ID's into firebase --> will need to configure them when we create a business account
+    channel: process.env.SLACK_CHANNEL_ID,
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `A new hype was created by <@U9A18B2M9>.\n\n*:tada: _I'll be speaking at SaaS North on being a first time founder_ :tada:*\n\n`,
+        },
+      },
+    ],
+  });
+
+  /**
+   *
+   * akshi - U021A35834H
+   * aashni - U9A18B2M9
+   * maggy - U024G6XLCCF
+   *
+   */
 
   return {
     statusCode: 200,

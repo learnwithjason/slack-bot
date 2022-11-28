@@ -33,6 +33,7 @@ export const SLACK_ACTIONS = {
   LIST_HYPE: "LIST_HYPE",
   NO_ACTION: "NO_ACTION",
   URL_VERIFICATION: "URL_VERIFICATION",
+  FAKE_CONTENT: "FAKE_CONTENT",
 };
 
 export const getCategoryName = (categoryValue) => {
