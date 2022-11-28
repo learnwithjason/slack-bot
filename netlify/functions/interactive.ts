@@ -32,20 +32,6 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  if (payload.view.callback_id === "new-hype") {
-    return {
-      statusCode: 200,
-      body: "",
-    };
-  } else {
-    // return an error message as we don't support the command
-  }
-
-  // TODO(aashni):
-  //  check data and format it as a new hype
-  //  push hype to firebase
-  //  if required, share hype to appropriate channels
-
   return {
     statusCode: 200,
     body: "",
