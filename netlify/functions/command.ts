@@ -58,11 +58,7 @@ export const handler: Handler = async (event) => {
   } else if (action === SLACK_ACTIONS.FAKE_CONTENT) {
     res = postFakeContentCommand(body, hypeUser[0]);
   } else {
-    return {
-      // TODO(aashni): check what the error code options are
-      statusCode: 404,
-      body: "Command usage incorrect. Try again",
-    };
+    res = commandNotFoundCommand(body, hypeUser[0], text);
   }
 
   // TODO(aashni): Check if res has any errors, otherwise return 200
@@ -142,6 +138,45 @@ const userNotFoundCommand = async (body, email) => {
             value: "contact_us",
             url: "mailto:contact@hypedocs.co",
             action_id: "button-action",
+          },
+        },
+      ],
+    },
+  });
+
+  console.log(res);
+
+  return res;
+};
+
+const commandNotFoundCommand = async (body, email, command) => {
+  const { trigger_id } = body;
+
+  let commandNotFoundText = `Unfortunately the command you entered, \`${command}\`, is not yet supported.\n\n\nTry one of the following options instead:\n\n\n\`/hypedocs add [hype/goal]\` to add a new hype or goal.\n\n\`/hypedocs list [hypes/goals]\` to list your hypes or goals.`;
+
+  const res = await slackApi("views.open", {
+    trigger_id,
+    view: {
+      type: "modal",
+      title: {
+        type: "plain_text",
+        text: "Command Not Found",
+      },
+      callback_id: "command-not-found",
+      blocks: [
+        {
+          type: "header",
+          text: {
+            type: "plain_text",
+            text: "The command you entered is not yet supported.",
+            emoji: true,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: commandNotFoundText,
           },
         },
       ],
