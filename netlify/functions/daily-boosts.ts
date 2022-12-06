@@ -8,8 +8,8 @@ import { getRandomHypeForUser, getUserByEmail, getUserHypes } from "./utils/db";
  * [ ] get list of users
  *      [ ] NOTE: hard coded for now/testing purposes
  * [ ] determine what type of boost
- *      [ ] hype boost:
- *           [ ] get list of hypes, pick one at random and send as a message
+ *      [x] hype boost:
+ *           [x] get list of hypes, pick one at random and send as a message
  *      [ ] goal boost:
  *           [ ] get list of goals, pick one at random and send as a message
  *      [ ] motivation:
@@ -17,11 +17,11 @@ import { getRandomHypeForUser, getUserByEmail, getUserHypes } from "./utils/db";
  *
  */
 
-export const handler: Handler = async (event) => {
-  // TODO(aashni): update to use real values, not hardcoded ones
-  let HARDCODED_USERS = ["contact@aashni.me"];
-  let HARDCODED_USER_ID = "U9A18B2M9";
+// TODO(aashni): update to use real values, not hardcoded ones
+let HARDCODED_USERS = ["contact@aashni.me"];
+let HARDCODED_USER_ID = "U9A18B2M9";
 
+export const handler: Handler = async (event) => {
   HARDCODED_USERS.forEach(async (email) => {
     // get user id
     let userFromDb = await getUserByEmail(email);
@@ -31,21 +31,25 @@ export const handler: Handler = async (event) => {
       return;
     }
 
-    let selectedHype = await getRandomHypeForUser(userFromDb[0].id);
-
-    // let message = ""
-
-    if (!selectedHype) {
-      // default in case no hype found, use generic prompt
-      dailyBoostGeneric(HARDCODED_USER_ID, "Aashni");
-    } else {
-      // update message if Hype was found
-      dailyBoostHype(HARDCODED_USER_ID, "Aashni", selectedHype[0].title);
-    }
+    hypeBoost(userFromDb[0]);
   });
 
   return {
     statusCode: 200,
     body: `WIP`,
   };
+};
+
+const hypeBoost = async (user) => {
+  let selectedHype = await getRandomHypeForUser(user.id);
+
+  // let message = ""
+
+  if (!selectedHype) {
+    // default in case no hype found, use generic prompt
+    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni");
+  } else {
+    // update message if Hype was found
+    dailyBoostHype(HARDCODED_USER_ID, "Aashni", selectedHype[0].title);
+  }
 };
