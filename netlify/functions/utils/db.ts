@@ -1,4 +1,5 @@
 import { firebaseAdmin } from "./firebase";
+import { v4 as uuidv4 } from "uuid";
 
 const firestore = firebaseAdmin.firestore();
 
@@ -44,6 +45,28 @@ export const getUserHypes = async (uid) => {
     .limitToLast(7)
     .get()
     .then(format);
+};
+
+const randomHypeQuery = async (randomId, comparator) => {
+  return firestore
+    .collection("hypeEvents")
+    .where("currentStatus", "==", "ACTIVE")
+    .where(firebaseAdmin.firestore.FieldPath.documentId(), comparator, randomId)
+    .limit(1)
+    .get()
+    .then(format);
+};
+
+export const getRandomHypeForUser = async (uid) => {
+  let randomId = uuidv4();
+
+  return await randomHypeQuery(randomId, ">=").then(async (result) => {
+    if (result.length > 0) {
+      return result;
+    } else {
+      return await randomHypeQuery(randomId, "<=");
+    }
+  });
 };
 
 //helper function
