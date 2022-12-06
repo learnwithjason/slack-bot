@@ -1,6 +1,16 @@
 import type { Handler } from "@netlify/functions";
-import { dailyBoostGeneric, dailyBoostHype } from "./utils/commonMessages";
-import { getRandomHypeForUser, getUserByEmail, getUserHypes } from "./utils/db";
+import {
+  dailyBoostGeneric,
+  dailyBoostGoal,
+  dailyBoostHype,
+  dailyBoostMotivation,
+} from "./utils/commonMessages";
+import {
+  getRandomGoalForUser,
+  getRandomHypeForUser,
+  getUserByEmail,
+  getUserHypes,
+} from "./utils/db";
 
 /**
  * Send daily boosts to users based on submitted hypes and goals
@@ -31,19 +41,29 @@ export const handler: Handler = async (event) => {
       return;
     }
 
-    hypeBoost(userFromDb[0]);
+    // 0-6, 0 = Sunday
+    let day = new Date().getDay();
+    console.log(day);
+
+    // if (day == 2 || day == 4) {
+    if (day == 230) {
+      hypeBoost(userFromDb[0]);
+      // } else if (day == 1 || day == 3) {
+    } else if (day == 0) {
+      goalBoost(userFromDb[0]);
+    } else {
+      motivationalBoost(userFromDb[0]);
+    }
   });
 
   return {
     statusCode: 200,
-    body: `WIP`,
+    body: `Success`,
   };
 };
 
 const hypeBoost = async (user) => {
   let selectedHype = await getRandomHypeForUser(user.id);
-
-  // let message = ""
 
   if (!selectedHype) {
     // default in case no hype found, use generic prompt
@@ -51,5 +71,29 @@ const hypeBoost = async (user) => {
   } else {
     // update message if Hype was found
     dailyBoostHype(HARDCODED_USER_ID, "Aashni", selectedHype[0].title);
+  }
+};
+
+const goalBoost = async (user) => {
+  let selectedGoal = await getRandomGoalForUser(user.id);
+
+  if (!selectedGoal) {
+    // default in case no hype found, use generic prompt
+    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni");
+  } else {
+    // update message if Hype was found
+    dailyBoostGoal(HARDCODED_USER_ID, "Aashni", selectedGoal[0].title);
+  }
+};
+
+const motivationalBoost = async (user) => {
+  let motivationalBoost = "This is a motivational boost";
+
+  if (!motivationalBoost) {
+    // default in case no hype found, use generic prompt
+    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni");
+  } else {
+    // update message if Hype was found
+    dailyBoostMotivation(HARDCODED_USER_ID, "Aashni", motivationalBoost);
   }
 };

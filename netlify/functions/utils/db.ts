@@ -57,6 +57,16 @@ const randomHypeQuery = async (randomId, comparator) => {
     .then(format);
 };
 
+const randomGoalQuery = async (randomId, comparator) => {
+  return firestore
+    .collection("goals")
+    .where("currentGoalStatus", "==", "ACTIVE_GOAL")
+    .where(firebaseAdmin.firestore.FieldPath.documentId(), comparator, randomId)
+    .limit(1)
+    .get()
+    .then(format);
+};
+
 export const getRandomHypeForUser = async (uid) => {
   let randomId = uuidv4();
 
@@ -65,6 +75,18 @@ export const getRandomHypeForUser = async (uid) => {
       return result;
     } else {
       return await randomHypeQuery(randomId, "<=");
+    }
+  });
+};
+
+export const getRandomGoalForUser = async (uid) => {
+  let randomId = uuidv4();
+
+  return await randomGoalQuery(randomId, ">=").then(async (result) => {
+    if (result.length > 0) {
+      return result;
+    } else {
+      return await randomGoalQuery(randomId, "<=");
     }
   });
 };
