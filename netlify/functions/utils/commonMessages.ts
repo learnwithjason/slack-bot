@@ -1,9 +1,14 @@
 import { slackApi } from "./slack";
 
-export const acknowledgeAction = async (channelId, actionType, userId) => {
+export const acknowledgeAction = async (
+  channelId,
+  userId,
+  actionType,
+  action
+) => {
   return await slackApi("chat.postEphemeral", {
     channel: channelId,
-    text: `Your ${actionType} was added to your HypeDoc! :tada:`,
+    text: `Your ${actionType}, _*${action}*_,  was added to your HypeDoc! :tada:`,
     user: userId,
   });
 };

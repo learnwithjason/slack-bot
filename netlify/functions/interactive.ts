@@ -69,14 +69,19 @@ const addHypeAction = async (payload) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `A new hype was created by <@${payload.user.id}>.\n\n*:tada: _${slackData.title}!_ :tada:*\n\n`,
+            text: `*:tada: _${slackData.title}!_ :tada:* - <@${payload.user.id}>'s latest hype!`,
           },
         },
       ],
     });
   }
 
-  acknowledgeAction(payload.user.id, "achievement", payload.user.id);
+  acknowledgeAction(
+    payload.user.id,
+    payload.user.id,
+    "achievement",
+    slackData.title
+  );
 };
 
 const addGoalAction = async (payload) => {
@@ -102,12 +107,12 @@ const addGoalAction = async (payload) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `<@${payload.user.id}> created a new goal!\n\n*:tada: _${slackData.title}!_ :tada:*\n\n`,
+            text: `*:tada: _${slackData.title}!_ :tada:* - <@${payload.user.id}>'s newest goal!`,
           },
         },
       ],
     });
   }
 
-  acknowledgeAction(payload.user.id, "goal", payload.user.id);
+  acknowledgeAction(payload.user.id, payload.user.id, "goal", slackData.title);
 };
