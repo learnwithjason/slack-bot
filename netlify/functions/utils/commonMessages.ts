@@ -1,5 +1,35 @@
 import { slackApi } from "./slack";
 
+export const listHypesMessage = async (userId, message) => {
+  await slackApi("chat.postMessage", {
+    channel: userId,
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: message,
+        },
+      },
+    ],
+  });
+};
+
+export const listGoalsMessage = async (userId, message) => {
+  await slackApi("chat.postMessage", {
+    channel: userId,
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: message,
+        },
+      },
+    ],
+  });
+};
+
 export const acknowledgeAction = async (
   channelId,
   userId,

@@ -1,5 +1,6 @@
 import type { Handler } from "@netlify/functions";
 import { parse } from "querystring";
+import { listGoalsMessage, listHypesMessage } from "./utils/commonMessages";
 import {
   getUserByEmail,
   getUser,
@@ -441,22 +442,10 @@ const addGoalCommand = async (body) => {
 const listHypeCommand = async (body, hypeUser) => {
   const { user_id } = body;
 
-  const userHypes = await getUserHypes(hypeUser.uid);
-
+  const userHypes = await getUserHypes(hypeUser.uid, 7);
   const slackMessage = await formatHypesForSlackMessage(userHypes);
 
-  await slackApi("chat.postMessage", {
-    channel: process.env.SLACK_CHANNEL_ID,
-    blocks: [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: slackMessage,
-        },
-      },
-    ],
-  });
+  await listGoalsMessage(user_id, slackMessage);
 
   return {
     statusCode: 200,
@@ -467,22 +456,11 @@ const listHypeCommand = async (body, hypeUser) => {
 const listGoalCommand = async (body, hypeUser) => {
   const { trigger_id, user_id, text } = body;
 
-  const userHypes = await getUserGoals(hypeUser.uid);
+  const userHypes = await getUserGoals(hypeUser.uid, 7);
 
   const slackMessage = await formatGoalsForSlackMessage(userHypes);
 
-  await slackApi("chat.postMessage", {
-    channel: process.env.SLACK_CHANNEL_ID,
-    blocks: [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: slackMessage,
-        },
-      },
-    ],
-  });
+  await listHypesMessage(user_id, slackMessage);
 
   return {
     statusCode: 200,
@@ -490,13 +468,7 @@ const listGoalCommand = async (body, hypeUser) => {
   };
 };
 
-const postFakeContentCommand = async (body, hypeUser) => {
-  const { trigger_id, user_id, text } = body;
-
-  const userHypes = await getUserGoals(hypeUser.uid);
-
-  const slackMessage = await formatGoalsForSlackMessage(userHypes);
-
+const postFakeContentCommand = async () => {
   await slackApi("chat.postMessage", {
     // TODO(aashni): need to store individual SLACK_CHANNEL_ID's into firebase --> will need to configure them when we create a business account
     channel: process.env.SLACK_CHANNEL_ID,

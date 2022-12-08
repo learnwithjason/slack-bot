@@ -29,20 +29,22 @@ export const getUserByEmail = async (email) => {
     .then(format);
 };
 
-export const getUserGoals = async (uid) => {
+export const getUserGoals = async (uid, limit = 0) => {
   return firestore
     .collection("goals")
     .where("user_id", "==", uid)
+    .orderBy("date", "asc")
+    .limitToLast(limit)
     .get()
     .then(format);
 };
 
-export const getUserHypes = async (uid) => {
+export const getUserHypes = async (uid, limit = 0) => {
   return firestore
     .collection("hypeEvents")
     .where("user_id", "==", uid)
-    .orderBy("date", "desc")
-    .limitToLast(7)
+    .orderBy("date", "asc")
+    .limitToLast(limit)
     .get()
     .then(format);
 };

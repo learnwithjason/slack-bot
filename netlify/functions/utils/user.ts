@@ -109,7 +109,7 @@ export const getFirebaseUserFromSlackUser = async (user_id) => {
 };
 
 export const getUserGoalOptionsFromFirebase = async (user_id) => {
-  const goalsFromFirebase = await getUserGoals(user_id);
+  const goalsFromFirebase = await getUserGoals(user_id, 0);
 
   const goalOptions = goalsFromFirebase.map((goal) => {
     return {
