@@ -67,10 +67,10 @@ export const dailyBoostGoal = async (userId, name, goal) => {
   }).catch((error) => console.log(error.message));
 };
 
-export const dailyBoostMotivation = async (userId, name, goal) => {
+export const dailyBoostMotivation = async (userId, name, boost) => {
   return await slackApi("chat.postMessage", {
     channel: userId,
     // user: userId,
-    text: `:tada::tada:Hey ${name}! _*${goal}*_ :tada::tada:\n\nYou're *awesome*! Add your latest achievements using \`/hypedocs add hype\`!`,
+    text: `:tada::tada:Hey ${name}! _*${boost}*_ :tada::tada:\n\nYou're *awesome*! Add your latest achievements using \`/hypedocs add hype\`!`,
   }).catch((error) => console.log(error.message));
 };
