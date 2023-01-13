@@ -36,7 +36,7 @@ export const handler: Handler = async (event) => {
   const tokenResp = await getToken(team_id);
   if (tokenResp.length !== 1) {
     // TODO(aashni): change this to a generic error message instead
-    await userNotFoundCommand(body, "email");
+    await userNotFoundCommand(body, "email", "authToken");
   }
   console.log(`tokenResp: ${JSON.stringify(tokenResp)}`);
   const AUTH_TOKEN = tokenResp[0].access_token;
@@ -49,7 +49,7 @@ export const handler: Handler = async (event) => {
   // TODO(aashni): add a check - if no user found, throw an error
   if (hypeUser.length < 1) {
     // user doesn't exist
-    await userNotFoundCommand(body, email);
+    await userNotFoundCommand(body, email, AUTH_TOKEN);
 
     return {
       statusCode: 200,
@@ -81,7 +81,7 @@ export const handler: Handler = async (event) => {
 };
 
 // HELPER FUNCTIONS
-const userNotFoundCommand = async (body, email) => {
+const userNotFoundCommand = async (body, email, authToken) => {
   const { trigger_id } = body;
 
   let createAnAccountText = `You can create an account easily through the web.`;
@@ -91,7 +91,7 @@ const userNotFoundCommand = async (body, email) => {
     createAnAccountText = `${createAnAccountText} In partnership with <CommunityName> you can use \`<DiscountCode>\` for a <DiscountAmount> discount.`;
   }
 
-  const res = await slackApi("views.open", {
+  const res = await slackApi("views.open", authToken, {
     trigger_id,
     view: {
       type: "modal",
