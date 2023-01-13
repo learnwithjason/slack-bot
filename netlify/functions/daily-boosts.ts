@@ -30,6 +30,7 @@ import {
 // TODO(aashni): update to use real values, not hardcoded ones
 let HARDCODED_USERS = ["contact@aashni.me"];
 let HARDCODED_USER_ID = "U9A18B2M9";
+let HARDCODED_AUTH_TOKEN = process.env.SLACK_BOT_OAUTH_TOKEN;
 
 export const handler: Handler = async (event) => {
   HARDCODED_USERS.forEach(async (email) => {
@@ -67,10 +68,15 @@ const hypeBoost = async (user) => {
 
   if (!selectedHype) {
     // default in case no hype found, use generic prompt
-    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni");
+    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni", HARDCODED_AUTH_TOKEN);
   } else {
     // update message if Hype was found
-    dailyBoostHype(HARDCODED_USER_ID, "Aashni", selectedHype[0].title);
+    dailyBoostHype(
+      HARDCODED_USER_ID,
+      "Aashni",
+      selectedHype[0].title,
+      HARDCODED_AUTH_TOKEN
+    );
   }
 };
 
@@ -79,10 +85,15 @@ const goalBoost = async (user) => {
 
   if (!selectedGoal) {
     // default in case no hype found, use generic prompt
-    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni");
+    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni", HARDCODED_AUTH_TOKEN);
   } else {
     // update message if Hype was found
-    dailyBoostGoal(HARDCODED_USER_ID, "Aashni", selectedGoal[0].title);
+    dailyBoostGoal(
+      HARDCODED_USER_ID,
+      "Aashni",
+      selectedGoal[0].title,
+      HARDCODED_AUTH_TOKEN
+    );
   }
 };
 
@@ -91,9 +102,14 @@ const motivationalBoost = async (user) => {
 
   if (!motivationalBoost) {
     // default in case no hype found, use generic prompt
-    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni");
+    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni", HARDCODED_AUTH_TOKEN);
   } else {
     // update message if Hype was found
-    dailyBoostMotivation(HARDCODED_USER_ID, "Aashni", motivationalBoost);
+    dailyBoostMotivation(
+      HARDCODED_USER_ID,
+      "Aashni",
+      HARDCODED_AUTH_TOKEN,
+      motivationalBoost
+    );
   }
 };

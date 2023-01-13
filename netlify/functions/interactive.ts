@@ -98,7 +98,8 @@ const addHypeAction = async (payload, authToken) => {
     payload.user.id,
     payload.user.id,
     "achievement",
-    slackData.title
+    slackData.title,
+    authToken
   );
 };
 
@@ -135,5 +136,11 @@ const addGoalAction = async (payload, authToken) => {
     });
   }
 
-  acknowledgeAction(payload.user.id, payload.user.id, "goal", slackData.title);
+  acknowledgeAction(
+    payload.user.id,
+    payload.user.id,
+    "goal",
+    slackData.title,
+    authToken
+  );
 };
