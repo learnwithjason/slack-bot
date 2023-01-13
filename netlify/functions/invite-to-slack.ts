@@ -5,7 +5,6 @@ import { getToken } from "./utils/db";
 import { slackApi } from "./utils/slack";
 
 export const handler: Handler = async (event) => {
-  console.log(`invite to slack is triggered`);
   if (!event.body) {
     return { statusCode: 500, body: "invalid payload" };
   }
@@ -22,10 +21,8 @@ export const handler: Handler = async (event) => {
       body: "Error: Could not authorize account",
     };
   }
-  console.log(`tokenResp: ${JSON.stringify(tokenResp)}`);
-  const AUTH_TOKEN = tokenResp[0].access_token;
 
-  console.log(`payload: ${JSON.stringify(payload)}`);
+  const AUTH_TOKEN = tokenResp[0].access_token;
 
   await slackApi("conversations.join", AUTH_TOKEN, {
     channel: process.env.SLACK_CHANNEL_ID,

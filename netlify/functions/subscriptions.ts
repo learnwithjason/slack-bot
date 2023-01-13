@@ -10,13 +10,11 @@ import {
 } from "./utils/user";
 
 export const handler: Handler = async (event) => {
-  console.log(`starting`);
   if (!event.body) {
     return { statusCode: 500, body: "invalid payload" };
   }
 
   const body = JSON.parse(event.body);
-  console.log(`body: ${JSON.stringify(body)}`);
 
   if (body.type === "url_verification") {
     // this is for URL verification

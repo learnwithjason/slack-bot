@@ -18,8 +18,6 @@ export const handler: Handler = async (event) => {
   const body = parse(event.body);
   const payload = JSON.parse(body.payload as string);
 
-  // console.log(`body: ${body}`);
-  // console.log(`payload: ${JSON.stringify(payload)}`);
   // get slack token
   const tokenResp = await getToken(payload.team.id);
   if (tokenResp.length !== 1) {
@@ -29,7 +27,7 @@ export const handler: Handler = async (event) => {
       body: "Error: Could not authorize account",
     };
   }
-  console.log(`tokenResp: ${JSON.stringify(tokenResp)}`);
+
   const AUTH_TOKEN = tokenResp[0].access_token;
 
   const action = getActionFromCallback(payload.view.callback_id);

@@ -30,25 +30,20 @@ export const handler: Handler = async (event) => {
   const body = parse(event.body);
   const { text, user_id, team_id } = body;
 
-  console.log(`teamId: ${team_id}`);
-
   // get slack token
   const tokenResp = await getToken(team_id);
   if (tokenResp.length !== 1) {
     // TODO(aashni): change this to a generic error message instead
     await userNotFoundCommand(body, "email", "authToken");
   }
-  console.log(`tokenResp: ${JSON.stringify(tokenResp)}`);
+
   const AUTH_TOKEN = tokenResp[0].access_token;
 
   // check if user exists
   const email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
   const hypeUser = await getUserByEmail(email);
-  console.log(`email: ${email} | hypeUser: ${JSON.stringify(hypeUser)}`);
 
-  // TODO(aashni): add a check - if no user found, throw an error
   if (hypeUser.length < 1) {
-    // user doesn't exist
     await userNotFoundCommand(body, email, AUTH_TOKEN);
 
     return {
