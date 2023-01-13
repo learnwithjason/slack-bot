@@ -7,6 +7,7 @@ import {
   createHype,
   getUserHypes,
   getUserGoals,
+  getToken,
 } from "./utils/db";
 import { getCategoriesForSlack, SLACK_ACTIONS } from "./utils/enums";
 import { slackApi } from "./utils/slack";
@@ -27,11 +28,23 @@ export const handler: Handler = async (event) => {
   }
 
   const body = parse(event.body);
-  const { text, user_id } = body;
+  const { text, user_id, team_id } = body;
+
+  console.log(`teamId: ${team_id}`);
+
+  // get slack token
+  const tokenResp = await getToken(team_id);
+  if (tokenResp.length !== 1) {
+    // TODO(aashni): change this to a generic error message instead
+    await userNotFoundCommand(body, "email");
+  }
+  console.log(`tokenResp: ${JSON.stringify(tokenResp)}`);
+  const AUTH_TOKEN = tokenResp[0].access_token;
 
   // check if user exists
-  const email = await getUserEmailFromSlack(user_id);
+  const email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
   const hypeUser = await getUserByEmail(email);
+  console.log(`email: ${email} | hypeUser: ${JSON.stringify(hypeUser)}`);
 
   // TODO(aashni): add a check - if no user found, throw an error
   if (hypeUser.length < 1) {
@@ -49,15 +62,15 @@ export const handler: Handler = async (event) => {
   let res = {};
 
   if (action === SLACK_ACTIONS.ADD_HYPE) {
-    res = addHypeCommand(body, hypeUser);
+    res = addHypeCommand(body, hypeUser, AUTH_TOKEN);
   } else if (action === SLACK_ACTIONS.ADD_GOAL) {
-    res = addGoalCommand(body);
+    res = addGoalCommand(body, AUTH_TOKEN);
   } else if (action === SLACK_ACTIONS.LIST_HYPE) {
-    res = listHypeCommand(body, hypeUser[0]);
+    res = listHypeCommand(body, hypeUser[0], AUTH_TOKEN);
   } else if (action === SLACK_ACTIONS.LIST_GOAL) {
-    res = listGoalCommand(body, hypeUser[0]);
+    res = listGoalCommand(body, hypeUser[0], AUTH_TOKEN);
   } else {
-    res = commandNotFoundCommand(body, hypeUser[0], text);
+    res = commandNotFoundCommand(body, hypeUser[0], AUTH_TOKEN, text);
   }
 
   // TODO(aashni): Check if res has any errors, otherwise return 200
@@ -148,12 +161,12 @@ const userNotFoundCommand = async (body, email) => {
   return res;
 };
 
-const commandNotFoundCommand = async (body, email, command) => {
+const commandNotFoundCommand = async (body, email, authToken, command) => {
   const { trigger_id } = body;
 
   let commandNotFoundText = `Unfortunately the command you entered, \`${command}\`, is not yet supported.\n\n\nTry one of the following options instead:\n\n\n\`/hypedocs add [hype/goal]\` to add a new hype or goal.\n\n\`/hypedocs list [hypes/goals]\` to list your hypes or goals.`;
 
-  const res = await slackApi("views.open", {
+  const res = await slackApi("views.open", authToken, {
     trigger_id,
     view: {
       type: "modal",
@@ -187,13 +200,13 @@ const commandNotFoundCommand = async (body, email, command) => {
   return res;
 };
 
-const addHypeCommand = async (body, hypeUser) => {
+const addHypeCommand = async (body, hypeUser, authToken) => {
   const { trigger_id } = body;
 
   const categoryOptions = getCategoriesForSlack();
   const goalOptions = await getUserGoalOptionsFromFirebase(hypeUser[0].uid);
 
-  const res = await slackApi("views.open", {
+  const res = await slackApi("views.open", authToken, {
     trigger_id,
     view: {
       type: "modal",
@@ -341,10 +354,10 @@ const addHypeCommand = async (body, hypeUser) => {
   return res;
 };
 
-const addGoalCommand = async (body) => {
+const addGoalCommand = async (body, authToken) => {
   const { trigger_id } = body;
 
-  const res = await slackApi("views.open", {
+  const res = await slackApi("views.open", authToken, {
     trigger_id,
     view: {
       type: "modal",
@@ -437,13 +450,13 @@ const addGoalCommand = async (body) => {
   return res;
 };
 
-const listHypeCommand = async (body, hypeUser) => {
+const listHypeCommand = async (body, hypeUser, authToken) => {
   const { user_id } = body;
 
   const userHypes = await getUserHypes(hypeUser.uid, 7);
   const slackMessage = await formatHypesForSlackMessage(userHypes);
 
-  await listGoalsMessage(user_id, slackMessage);
+  await listGoalsMessage(user_id, slackMessage, authToken);
 
   return {
     statusCode: 200,
@@ -451,14 +464,14 @@ const listHypeCommand = async (body, hypeUser) => {
   };
 };
 
-const listGoalCommand = async (body, hypeUser) => {
+const listGoalCommand = async (body, hypeUser, authToken) => {
   const { trigger_id, user_id, text } = body;
 
   const userHypes = await getUserGoals(hypeUser.uid, 7);
 
   const slackMessage = await formatGoalsForSlackMessage(userHypes);
 
-  await listHypesMessage(user_id, slackMessage);
+  await listHypesMessage(user_id, slackMessage, authToken);
 
   return {
     statusCode: 200,

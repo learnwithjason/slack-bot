@@ -1,7 +1,7 @@
 import { slackApi } from "./slack";
 
-export const listHypesMessage = async (userId, message) => {
-  await slackApi("chat.postMessage", {
+export const listHypesMessage = async (userId, message, authToken) => {
+  await slackApi("chat.postMessage", authToken, {
     channel: userId,
     blocks: [
       {
@@ -15,8 +15,8 @@ export const listHypesMessage = async (userId, message) => {
   });
 };
 
-export const listGoalsMessage = async (userId, message) => {
-  await slackApi("chat.postMessage", {
+export const listGoalsMessage = async (userId, message, authToken) => {
+  await slackApi("chat.postMessage", authToken, {
     channel: userId,
     blocks: [
       {

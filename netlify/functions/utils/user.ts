@@ -90,15 +90,15 @@ export const getActionFromSubscription = async (subscription) => {
   return action;
 };
 
-export const getUserEmailFromSlack = async (user_id) => {
-  const slackUser = await slackApi(`users.info?user=${user_id}`);
+export const getUserEmailFromSlack = async (user_id, AUTH_TOKEN) => {
+  const slackUser = await slackApi(`users.info?user=${user_id}`, AUTH_TOKEN);
   const email = slackUser.user?.profile?.email || false;
 
   return email;
 };
 
-export const getFirebaseUserFromSlackUser = async (user_id) => {
-  const slackEmail = await getUserEmailFromSlack(user_id);
+export const getFirebaseUserFromSlackUser = async (user_id, AUTH_TOKEN) => {
+  const slackEmail = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
   const firebaseUser = !!slackEmail ? await getUserByEmail(slackEmail) : {};
   return firebaseUser;
 };
