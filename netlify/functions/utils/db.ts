@@ -3,13 +3,12 @@ import { v4 as uuidv4 } from "uuid";
 
 const firestore = firebaseAdmin.firestore();
 
-export const getToken = async (teamId) => {
-  let resp = firestore
+export const getSlackAccount = async (teamId) => {
+  return firestore
     .collection("slack")
     .where("team_id", "==", teamId)
     .get()
     .then(format);
-  return resp;
 };
 
 export const createHype = async (hypeData) => {

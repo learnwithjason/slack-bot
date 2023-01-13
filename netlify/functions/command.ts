@@ -7,7 +7,7 @@ import {
   createHype,
   getUserHypes,
   getUserGoals,
-  getToken,
+  getSlackAccount,
 } from "./utils/db";
 import { getCategoriesForSlack, SLACK_ACTIONS } from "./utils/enums";
 import { slackApi } from "./utils/slack";
@@ -31,13 +31,15 @@ export const handler: Handler = async (event) => {
   const { text, user_id, team_id } = body;
 
   // get slack token
-  const tokenResp = await getToken(team_id);
-  if (tokenResp.length !== 1) {
+  const slackResp = await getSlackAccount(team_id);
+  if (slackResp.length !== 1) {
     // TODO(aashni): change this to a generic error message instead
     await userNotFoundCommand(body, "email", "authToken");
   }
 
-  const AUTH_TOKEN = tokenResp[0].access_token;
+  const AUTH_TOKEN = slackResp[0].access_token;
+  const WINS_CHANNEL_ID = slackResp[0].wins_channel_id;
+  const WINS_CHANNEL_NAME = slackResp[0].wins_channel_name;
 
   // check if user exists
   const email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
@@ -57,7 +59,7 @@ export const handler: Handler = async (event) => {
   let res = {};
 
   if (action === SLACK_ACTIONS.ADD_HYPE) {
-    res = addHypeCommand(body, hypeUser, AUTH_TOKEN);
+    res = addHypeCommand(body, hypeUser, AUTH_TOKEN, WINS_CHANNEL_NAME);
   } else if (action === SLACK_ACTIONS.ADD_GOAL) {
     res = addGoalCommand(body, AUTH_TOKEN);
   } else if (action === SLACK_ACTIONS.LIST_HYPE) {
@@ -195,7 +197,7 @@ const commandNotFoundCommand = async (body, email, authToken, command) => {
   return res;
 };
 
-const addHypeCommand = async (body, hypeUser, authToken) => {
+const addHypeCommand = async (body, hypeUser, authToken, winChannelName) => {
   const { trigger_id } = body;
 
   const categoryOptions = getCategoriesForSlack();
@@ -319,7 +321,7 @@ const addHypeCommand = async (body, hypeUser, authToken) => {
               {
                 text: {
                   type: "plain_text",
-                  text: "Share on Slack in #channel",
+                  text: `Share on Slack in #${winChannelName}`,
                   emoji: true,
                 },
                 value: "slack",

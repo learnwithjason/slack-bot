@@ -1,7 +1,7 @@
 import type { Handler } from "@netlify/functions";
 import { parse } from "querystring";
 import { acknowledgeAction } from "./utils/commonMessages";
-import { getToken } from "./utils/db";
+import { getSlackAccount } from "./utils/db";
 import { SLACK_ACTIONS } from "./utils/enums";
 import { createNewHype, createNewGoal } from "./utils/hypes";
 import { slackApi } from "./utils/slack";
@@ -19,7 +19,7 @@ export const handler: Handler = async (event) => {
   const payload = JSON.parse(body.payload as string);
 
   // get slack token
-  const tokenResp = await getToken(payload.team.id);
+  const tokenResp = await getSlackAccount(payload.team.id);
   if (tokenResp.length !== 1) {
     return {
       // TODO(aashni): check what the error code options are
