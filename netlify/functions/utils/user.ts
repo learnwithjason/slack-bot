@@ -9,11 +9,6 @@ export const getActionFromText = (text) => {
     action = SLACK_ACTIONS.NO_ACTION;
   }
 
-  if (text === "fake") {
-    action = SLACK_ACTIONS.FAKE_CONTENT;
-    return action;
-  }
-
   const words = text.split(" ");
   if (words[0] === "add") {
     action =

@@ -56,8 +56,6 @@ export const handler: Handler = async (event) => {
     res = listHypeCommand(body, hypeUser[0]);
   } else if (action === SLACK_ACTIONS.LIST_GOAL) {
     res = listGoalCommand(body, hypeUser[0]);
-  } else if (action === SLACK_ACTIONS.FAKE_CONTENT) {
-    res = postFakeContentCommand(body, hypeUser[0]);
   } else {
     res = commandNotFoundCommand(body, hypeUser[0], text);
   }
@@ -461,35 +459,6 @@ const listGoalCommand = async (body, hypeUser) => {
   const slackMessage = await formatGoalsForSlackMessage(userHypes);
 
   await listHypesMessage(user_id, slackMessage);
-
-  return {
-    statusCode: 200,
-    body: "",
-  };
-};
-
-const postFakeContentCommand = async () => {
-  await slackApi("chat.postMessage", {
-    // TODO(aashni): need to store individual SLACK_CHANNEL_ID's into firebase --> will need to configure them when we create a business account
-    channel: process.env.SLACK_CHANNEL_ID,
-    blocks: [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: `A new hype was created by <@U9A18B2M9>.\n\n*:tada: _I'll be speaking at SaaS North on being a first time founder_ :tada:*\n\n`,
-        },
-      },
-    ],
-  });
-
-  /**
-   *
-   * akshi - U021A35834H
-   * aashni - U9A18B2M9
-   * maggy - U024G6XLCCF
-   *
-   */
 
   return {
     statusCode: 200,

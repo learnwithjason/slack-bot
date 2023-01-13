@@ -34,7 +34,6 @@ export const SLACK_ACTIONS = {
   DAILY_BOOST: "DAILY_BOOST",
   NO_ACTION: "NO_ACTION",
   URL_VERIFICATION: "URL_VERIFICATION",
-  FAKE_CONTENT: "FAKE_CONTENT",
 };
 
 export const getCategoryName = (categoryValue) => {
