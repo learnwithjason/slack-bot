@@ -19,8 +19,8 @@ export const handler: Handler = async (event) => {
   const payload = JSON.parse(body.payload as string);
 
   // get slack token
-  const tokenResp = await getSlackAccount(payload.team.id);
-  if (tokenResp.length !== 1) {
+  const slackResp = await getSlackAccount(payload.team.id);
+  if (slackResp.length !== 1) {
     return {
       // TODO(aashni): check what the error code options are
       statusCode: 404,
@@ -28,15 +28,16 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  const AUTH_TOKEN = tokenResp[0].access_token;
+  const AUTH_TOKEN = slackResp[0].access_token;
+  const WINS_CHANNEL_ID = slackResp[0].wins_channel_id;
 
   const action = getActionFromCallback(payload.view.callback_id);
   let res = {};
 
   if (action === SLACK_ACTIONS.ADD_HYPE) {
-    res = addHypeAction(payload, AUTH_TOKEN);
+    res = addHypeAction(payload, AUTH_TOKEN, WINS_CHANNEL_ID);
   } else if (action === SLACK_ACTIONS.ADD_GOAL) {
-    res = addGoalAction(payload, AUTH_TOKEN);
+    res = addGoalAction(payload, AUTH_TOKEN, WINS_CHANNEL_ID);
   } else {
     return {
       // TODO(aashni): check what the error code options are
@@ -53,7 +54,7 @@ export const handler: Handler = async (event) => {
 
 // HELPER ACTION FUNCTIONS
 
-const addHypeAction = async (payload, authToken) => {
+const addHypeAction = async (payload, authToken, winsChannelId) => {
   const values = payload.view.state.values;
 
   // simplify the data from Slack a bit
@@ -79,7 +80,7 @@ const addHypeAction = async (payload, authToken) => {
   if (isSlackSelected) {
     await slackApi("chat.postMessage", authToken, {
       // TODO(aashni): need to store individual SLACK_CHANNEL_ID's into firebase --> will need to configure them when we create a business account
-      channel: process.env.SLACK_CHANNEL_ID,
+      channel: winsChannelId,
       blocks: [
         {
           type: "section",
@@ -101,7 +102,7 @@ const addHypeAction = async (payload, authToken) => {
   );
 };
 
-const addGoalAction = async (payload, authToken) => {
+const addGoalAction = async (payload, authToken, winsChannelId) => {
   const values = payload.view.state.values;
 
   // simplify the data from Slack a bit
@@ -121,7 +122,7 @@ const addGoalAction = async (payload, authToken) => {
   if (isSlackSelected) {
     await slackApi("chat.postMessage", authToken, {
       // TODO(aashni): need to store individual SLACK_CHANNEL_ID's into firebase --> will need to configure them when we create a business account
-      channel: process.env.SLACK_CHANNEL_ID,
+      channel: winsChannelId,
       blocks: [
         {
           type: "section",
