@@ -293,12 +293,17 @@ const addHypeCommand = async (
             action_id: "category",
             type: "static_select",
             options: categoryOptions,
-            initial_option: categoryOptions[0],
+            placeholder: {
+              type: "plain_text",
+              text: "Select a category",
+              emoji: true,
+            },
           },
         },
         {
           block_id: "goal_block",
           type: "input",
+          optional: true,
           label: {
             type: "plain_text",
             text: "Is this related to any of your goals?",
@@ -307,7 +312,11 @@ const addHypeCommand = async (
             action_id: "goal",
             type: "static_select",
             options: goalOptions,
-            initial_option: goalOptions[0],
+            placeholder: {
+              type: "plain_text",
+              text: "Select a goal",
+              emoji: true,
+            },
           },
         },
         {
