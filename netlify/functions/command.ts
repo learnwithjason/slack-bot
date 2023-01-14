@@ -40,6 +40,7 @@ export const handler: Handler = async (event) => {
   const AUTH_TOKEN = slackResp[0].access_token;
   const WINS_CHANNEL_ID = slackResp[0].wins_channel_id;
   const WINS_CHANNEL_NAME = slackResp[0].wins_channel_name;
+  const SLACK_DATA = slackResp[0];
 
   // check if user exists
   const email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
@@ -59,9 +60,20 @@ export const handler: Handler = async (event) => {
   let res = {};
 
   if (action === SLACK_ACTIONS.ADD_HYPE) {
-    res = addHypeCommand(body, hypeUser, AUTH_TOKEN, WINS_CHANNEL_NAME);
+    res = addHypeCommand(
+      body,
+      hypeUser,
+      AUTH_TOKEN,
+      SLACK_DATA.team_name,
+      WINS_CHANNEL_NAME
+    );
   } else if (action === SLACK_ACTIONS.ADD_GOAL) {
-    res = addGoalCommand(body, AUTH_TOKEN);
+    res = addGoalCommand(
+      body,
+      AUTH_TOKEN,
+      SLACK_DATA.team_name,
+      WINS_CHANNEL_NAME
+    );
   } else if (action === SLACK_ACTIONS.LIST_HYPE) {
     res = listHypeCommand(body, hypeUser[0], AUTH_TOKEN);
   } else if (action === SLACK_ACTIONS.LIST_GOAL) {
@@ -197,7 +209,13 @@ const commandNotFoundCommand = async (body, email, authToken, command) => {
   return res;
 };
 
-const addHypeCommand = async (body, hypeUser, authToken, winChannelName) => {
+const addHypeCommand = async (
+  body,
+  hypeUser,
+  authToken,
+  slackName,
+  winChannelName
+) => {
   const { trigger_id } = body;
 
   const categoryOptions = getCategoriesForSlack();
@@ -321,7 +339,7 @@ const addHypeCommand = async (body, hypeUser, authToken, winChannelName) => {
               {
                 text: {
                   type: "plain_text",
-                  text: `Share on Slack in #${winChannelName}`,
+                  text: `Share on ${slackName}'s Slack in #${winChannelName}`,
                   emoji: true,
                 },
                 value: "slack",
@@ -351,7 +369,7 @@ const addHypeCommand = async (body, hypeUser, authToken, winChannelName) => {
   return res;
 };
 
-const addGoalCommand = async (body, authToken) => {
+const addGoalCommand = async (body, authToken, slackName, winChannelName) => {
   const { trigger_id } = body;
 
   const res = await slackApi("views.open", authToken, {
@@ -426,7 +444,7 @@ const addGoalCommand = async (body, authToken) => {
               {
                 text: {
                   type: "plain_text",
-                  text: "Share on Slack in #channel",
+                  text: `Share on ${slackName}'s Slack in #${winChannelName}`,
                   emoji: true,
                 },
                 value: "slack",
