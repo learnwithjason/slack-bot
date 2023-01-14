@@ -344,14 +344,6 @@ const addHypeCommand = async (
                 },
                 value: "slack",
               },
-              {
-                text: {
-                  type: "plain_text",
-                  text: "Add to your Public Page",
-                  emoji: true,
-                },
-                value: "publicPage",
-              },
             ],
           },
           label: {

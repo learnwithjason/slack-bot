@@ -8,10 +8,6 @@ export const createNewHype = async (firebaseUser, slackData) => {
   // TODO(aashni): figure out if we want to make fields optional or required
   //      and if required, how do we throw an error on slack
 
-  const isPublicPageSelected = slackData.sharing.find((shared) => {
-    return shared.value === "publicPage";
-  });
-
   // Getting data:
   let hypeData = {
     id: uuidv4(),
@@ -22,7 +18,6 @@ export const createNewHype = async (firebaseUser, slackData) => {
     description: slackData.description,
     category: slackData.category || "",
     goal: slackData.goal || "",
-    public: isPublicPageSelected !== undefined,
     currentStatus: "ACTIVE",
   };
 
