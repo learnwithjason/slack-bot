@@ -37,10 +37,17 @@ export const handler: Handler = async (event) => {
 
   // get slack token
   const slackResp = await getSlackAccount(team_id);
+  console.log(`slackResp: ${JSON.stringify(slackResp)}`);
   if (slackResp.length !== 1) {
+    console.log("slackResp.length !== 1");
     // TODO(aashni): change this to a generic error message instead
     await userNotFoundCommand(body, "email", "authToken");
+    return {
+      statusCode: 200,
+      body: "Slack Authentication failed",
+    };
   }
+  console.log("user found");
 
   const AUTH_TOKEN = slackResp[0].access_token;
   const WINS_CHANNEL_ID = slackResp[0].wins_channel_id;
@@ -50,8 +57,11 @@ export const handler: Handler = async (event) => {
   // check if user exists
   const email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
   const hypeUser = await getUserByEmail(email);
+  console.log(`email: ${email}`);
+  console.log(`hypeUser: ${JSON.stringify(hypeUser)}`);
 
   if (hypeUser.length < 1) {
+    console.log("hypeuser.length < 1");
     await userNotFoundCommand(body, email, AUTH_TOKEN);
 
     return {
@@ -61,10 +71,12 @@ export const handler: Handler = async (event) => {
   }
 
   let action = getActionFromText(text);
+  console.log(`action: ${action}`);
 
   let res = {};
 
   if (action === SLACK_ACTIONS.ADD_HYPE) {
+    console.log("go to addHypeCommand");
     res = addHypeCommand(
       body,
       hypeUser,
@@ -73,6 +85,7 @@ export const handler: Handler = async (event) => {
       WINS_CHANNEL_NAME
     );
   } else if (action === SLACK_ACTIONS.ADD_GOAL) {
+    console.log("go to addGoalCommand");
     res = addGoalCommand(
       body,
       AUTH_TOKEN,
@@ -80,14 +93,18 @@ export const handler: Handler = async (event) => {
       WINS_CHANNEL_NAME
     );
   } else if (action === SLACK_ACTIONS.LIST_HYPE) {
+    console.log("go to listHypeCommand");
     res = listHypeCommand(body, hypeUser[0], AUTH_TOKEN);
   } else if (action === SLACK_ACTIONS.LIST_GOAL) {
+    console.log("go to listGoalCommand");
     res = listGoalCommand(body, hypeUser[0], AUTH_TOKEN);
   } else {
+    console.log("go to commandNotFoundCommand");
     res = commandNotFoundCommand(body, hypeUser[0], AUTH_TOKEN, text);
   }
 
   // TODO(aashni): Check if res has any errors, otherwise return 200
+  console.log("return 200 success");
   return {
     statusCode: 200,
     body: "",
