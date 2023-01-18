@@ -20,6 +20,7 @@ import {
 } from "./utils/user";
 
 export const handler: Handler = async (event) => {
+  console.log(`inside command`);
   if (!event.body) {
     return {
       statusCode: 500,
@@ -32,6 +33,7 @@ export const handler: Handler = async (event) => {
   if (!text || !user_id || !team_id) {
     return { statusCode: 500, body: "Error: missing parameters" };
   }
+  console.log(`text: ${text} | user_id: ${user_id} | team_id: ${team_id}`);
 
   // get slack token
   const slackResp = await getSlackAccount(team_id);

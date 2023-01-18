@@ -11,6 +11,7 @@ import {
 } from "./utils/user";
 
 export const handler: Handler = async (event) => {
+  console.log(`inside interactive`);
   if (!event.body) {
     return { statusCode: 500, body: "invalid payload" };
   }
@@ -20,6 +21,7 @@ export const handler: Handler = async (event) => {
     return { statusCode: 500, body: "invalid payload" };
   }
   const payload = JSON.parse(body.payload as string);
+  console.log(`payload: ${JSON.stringify(payload)}`);
 
   // get slack token
   const slackResp = await getSlackAccount(payload.team.id);
