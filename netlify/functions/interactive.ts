@@ -37,17 +37,21 @@ export const handler: Handler = async (event) => {
   const WINS_CHANNEL_ID = slackResp[0].wins_channel_id;
 
   const action = getActionFromCallback(payload.view.callback_id);
-  let res = {};
+  let res;
 
   if (action === SLACK_ACTIONS.ADD_HYPE) {
-    res = addHypeAction(payload, AUTH_TOKEN, WINS_CHANNEL_ID);
+    res = await addHypeAction(payload, AUTH_TOKEN, WINS_CHANNEL_ID);
   } else if (action === SLACK_ACTIONS.ADD_GOAL) {
-    res = addGoalAction(payload, AUTH_TOKEN, WINS_CHANNEL_ID);
+    res = await addGoalAction(payload, AUTH_TOKEN, WINS_CHANNEL_ID);
   } else {
-    res = actionNotFoundAction();
+    res = await actionNotFoundAction();
   }
 
-  return res;
+  return {
+    // TODO(aashni): check what the error code options are
+    statusCode: 200,
+    body: "",
+  };
 };
 
 // HELPER ACTION FUNCTIONS

@@ -73,11 +73,11 @@ export const handler: Handler = async (event) => {
   let action = getActionFromText(text);
   console.log(`action: ${action}`);
 
-  let res = {};
+  let res;
 
   if (action === SLACK_ACTIONS.ADD_HYPE) {
     console.log("go to addHypeCommand");
-    res = addHypeCommand(
+    res = await addHypeCommand(
       body,
       hypeUser,
       AUTH_TOKEN,
@@ -86,7 +86,7 @@ export const handler: Handler = async (event) => {
     );
   } else if (action === SLACK_ACTIONS.ADD_GOAL) {
     console.log("go to addGoalCommand");
-    res = addGoalCommand(
+    res = await addGoalCommand(
       body,
       AUTH_TOKEN,
       SLACK_DATA.team_name,
@@ -94,13 +94,13 @@ export const handler: Handler = async (event) => {
     );
   } else if (action === SLACK_ACTIONS.LIST_HYPE) {
     console.log("go to listHypeCommand");
-    res = listHypeCommand(body, hypeUser[0], AUTH_TOKEN);
+    res = await listHypeCommand(body, hypeUser[0], AUTH_TOKEN);
   } else if (action === SLACK_ACTIONS.LIST_GOAL) {
     console.log("go to listGoalCommand");
-    res = listGoalCommand(body, hypeUser[0], AUTH_TOKEN);
+    res = await listGoalCommand(body, hypeUser[0], AUTH_TOKEN);
   } else {
     console.log("go to commandNotFoundCommand");
-    res = commandNotFoundCommand(body, hypeUser[0], AUTH_TOKEN, text);
+    res = await commandNotFoundCommand(body, hypeUser[0], AUTH_TOKEN, text);
   }
 
   // TODO(aashni): Check if res has any errors, otherwise return 200
@@ -185,7 +185,10 @@ const userNotFoundCommand = async (body, email, authToken) => {
 
   console.log(res);
 
-  return res;
+  return {
+    statusCode: 200,
+    body: "",
+  };
 };
 
 const commandNotFoundCommand = async (body, email, authToken, command) => {
