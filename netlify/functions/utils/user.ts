@@ -105,17 +105,26 @@ export const getFirebaseUserFromSlackUser = async (user_id, AUTH_TOKEN) => {
 
 export const getUserGoalOptionsFromFirebase = async (user_id) => {
   const goalsFromFirebase = await getUserGoals(user_id, 0);
+  const goalOptions: object[] = [];
 
-  const goalOptions = goalsFromFirebase.map((goal) => {
-    return {
-      text: {
-        type: "plain_text",
-        text: goal.title,
-        emoji: true,
-      },
-      value: goal.id,
-    };
-  });
+  if (goalsFromFirebase.length === 0) {
+    // set initial "No Goal" option
+    goalOptions.push({
+      text: { type: "plain_text", text: "No Goal", emoji: true },
+      value: "NO_GOAL_SELECTED",
+    });
+  } else {
+    goalsFromFirebase.forEach((goal) => {
+      goalOptions.push({
+        text: {
+          type: "plain_text",
+          text: goal.title,
+          emoji: true,
+        },
+        value: goal.id,
+      });
+    });
+  }
 
   return goalOptions;
 };

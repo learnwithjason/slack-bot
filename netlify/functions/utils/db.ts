@@ -22,11 +22,9 @@ export const createGoal = async (goalData) => {
 export const getUser = async (uid) => {
   return firestore
     .collection("users")
-    .doc(uid)
+    .where("uid", "==", uid)
     .get()
-    .then((data) => {
-      return data.data();
-    });
+    .then(format);
 };
 
 export const getUserByEmail = async (email) => {

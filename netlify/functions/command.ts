@@ -23,12 +23,15 @@ export const handler: Handler = async (event) => {
   if (!event.body) {
     return {
       statusCode: 500,
-      body: "error",
+      body: "Error: missing parameters",
     };
   }
 
   const body = parse(event.body);
   const { text, user_id, team_id } = body;
+  if (!text || !user_id || !team_id) {
+    return { statusCode: 500, body: "Error: missing parameters" };
+  }
 
   // get slack token
   const slackResp = await getSlackAccount(team_id);

@@ -16,6 +16,9 @@ export const handler: Handler = async (event) => {
   }
 
   const body = parse(event.body);
+  if (!body.payload) {
+    return { statusCode: 500, body: "invalid payload" };
+  }
   const payload = JSON.parse(body.payload as string);
 
   // get slack token
@@ -57,12 +60,15 @@ export const handler: Handler = async (event) => {
 const addHypeAction = async (payload, authToken, winsChannelId) => {
   const values = payload.view.state.values;
 
+  // hack to support when a user has no goals
+  let goal = getGoalValueFromBlock(values.goal_block.goal);
+
   // simplify the data from Slack a bit
   const slackData = {
     title: values.title_block.title.value,
     date: values.date_block.date.selected_date,
     category: values.category_block.category.selected_option.value,
-    goal: values.goal_block.goal.selected_option.value,
+    goal: goal,
     description: values.description_block.description.value,
     sharing: values.sharing_block.sharing.selected_options,
   };
@@ -142,4 +148,15 @@ const addGoalAction = async (payload, authToken, winsChannelId) => {
     slackData.title,
     authToken
   );
+};
+
+const getGoalValueFromBlock = (goalFromBlock) => {
+  // check if goal exists
+  if (goalFromBlock && goalFromBlock.selected_option) {
+    return goalFromBlock.selected_option.value === "NO_GOAL_SELECTED"
+      ? ""
+      : goalFromBlock.selected_option.value;
+  }
+
+  return "";
 };

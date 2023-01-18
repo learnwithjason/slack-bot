@@ -82,7 +82,7 @@ Once everything is verified working, deploy the site and update your Slack slash
 ntl dev --live
 ```
 
-2. Update URL on Slack:
+2. Update URLs on Slack:
 
 - https://api.slack.com/apps/A047M3JV3A9/interactive-messages
 - https://api.slack.com/apps/A047M3JV3A9/slash-commands
