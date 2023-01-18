@@ -44,17 +44,10 @@ export const handler: Handler = async (event) => {
   } else if (action === SLACK_ACTIONS.ADD_GOAL) {
     res = addGoalAction(payload, AUTH_TOKEN, WINS_CHANNEL_ID);
   } else {
-    return {
-      // TODO(aashni): check what the error code options are
-      statusCode: 404,
-      body: "Command usage incorrect. Try again",
-    };
+    res = actionNotFoundAction();
   }
 
-  return {
-    statusCode: 200,
-    body: "",
-  };
+  return res;
 };
 
 // HELPER ACTION FUNCTIONS
@@ -150,6 +143,14 @@ const addGoalAction = async (payload, authToken, winsChannelId) => {
     slackData.title,
     authToken
   );
+};
+
+const actionNotFoundAction = async () => {
+  return {
+    // TODO(aashni): check what the error code options are
+    statusCode: 404,
+    body: "Command usage incorrect. Try again",
+  };
 };
 
 const getGoalValueFromBlock = (goalFromBlock) => {

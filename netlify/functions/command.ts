@@ -104,12 +104,7 @@ export const handler: Handler = async (event) => {
   }
 
   // TODO(aashni): Check if res has any errors, otherwise return 200
-  console.log("return res: ${JSON.stringify(res");
   return res;
-  // return {
-  //   statusCode: 200,
-  //   body: "",
-  // };
 };
 
 // HELPER FUNCTIONS
