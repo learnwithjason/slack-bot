@@ -84,7 +84,6 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
 
   if (isSlackSelected) {
     await slackApi("chat.postMessage", authToken, {
-      // TODO(aashni): need to store individual SLACK_CHANNEL_ID's into firebase --> will need to configure them when we create a business account
       channel: winsChannelId,
       blocks: [
         {
@@ -126,7 +125,6 @@ const addGoalAction = async (payload, authToken, winsChannelId) => {
   });
   if (isSlackSelected) {
     await slackApi("chat.postMessage", authToken, {
-      // TODO(aashni): need to store individual SLACK_CHANNEL_ID's into firebase --> will need to configure them when we create a business account
       channel: winsChannelId,
       blocks: [
         {

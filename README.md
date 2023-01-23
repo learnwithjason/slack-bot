@@ -1,8 +1,8 @@
-# Slack to Notion DB Slash Command
+# HypeDocs Slack App to let Slack users track hypes and goals, while celebrating everyone at the company
 
-A slash command for Slack that will open a modal to collect request information, then save it to a Notion database.
+A slash command to let users add hypes and goals to their account.
 
-This also sets up a [scheduled function](https://docs.netlify.com/netlify-labs/experimental-features/scheduled-functions/) to check for requests that still need to be triaged and post them to a Slack channel.
+This also sets up a [scheduled function](https://docs.netlify.com/netlify-labs/experimental-features/scheduled-functions/) to send daily hype boosts to engage users more
 
 ## Local Dev
 
@@ -10,20 +10,6 @@ This also sets up a [scheduled function](https://docs.netlify.com/netlify-labs/e
 
 - `SLACK_BOT_OAUTH_TOKEN` — get one here: https://api.slack.com/apps
   - Required scopes: `channels:join`, `chat:write`, `commands`,
-- `NOTION_INTEGRATION_TOKEN` — get one here: https://www.notion.so/my-integrations
-- `NOTION_DB_ID` — get the link to your database and the ID is the first hash after the domain and workspace name
-  ```text
-  https://www.notion.so/jlengstorf/29f4a66d910f43a9b70b4c7eda097187?v=953c4a04ea794fe9b931383b487c327c
-                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                                           this is the DB ID
-  ```
-- `SLACK_CHANNEL_ID` — right click on the channel you want to notify in Slack, then copy => copy link and grab the channel ID from the end of the URL
-
-  ```text
-  https://learnwithjason.slack.com/archives/C043M67FJUR
-                                            ^^^^^^^^^^^
-                                            channel ID
-  ```
 
 ### Initial Setup
 
@@ -35,15 +21,6 @@ This also sets up a [scheduled function](https://docs.netlify.com/netlify-labs/e
 
   # initialize a new Netlify site
   ntl init
-  ```
-
-- Set up the required env vars
-
-  ```sh
-  ntl env:set SLACK_BOT_OAUTH_TOKEN <your_token>
-  ntl env:set NOTION_INTEGRATION_TOKEN <your_token>
-  ntl env:set NOTION_DB_ID <your_db_id>
-  ntl env:set SLACK_CHANNEL_ID <your_channel_id>
   ```
 
 - Start the server with a live tunnel
@@ -84,6 +61,16 @@ ntl dev --live
 
 2. Update URLs on Slack:
 
+## Production URLS to update on Slack
+
 - https://api.slack.com/apps/A047M3JV3A9/interactive-messages
 - https://api.slack.com/apps/A047M3JV3A9/slash-commands
 - https://api.slack.com/apps/A047M3JV3A9/event-subscriptions
+- Get shareable URL Link: https://app.slack.com/app-settings/T99HD5M6D/A047M3JV3A9/distribute
+
+## Staging URLS to update on Slack
+
+- https://api.slack.com/apps/A01SU20000G/interactive-messages
+- https://api.slack.com/apps/A01SU20000G/slash-commands
+- https://api.slack.com/apps/A01SU20000G/event-subscriptions
+- Get shareable URL Link: https://app.slack.com/app-settings/T019JD5PLKC/A01SU20000G/distribute

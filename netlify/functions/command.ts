@@ -194,7 +194,7 @@ const userNotFoundCommand = async (body, email, authToken) => {
 const commandNotFoundCommand = async (body, email, authToken, command) => {
   const { trigger_id } = body;
 
-  let commandNotFoundText = `Unfortunately the command you entered, \`${command}\`, is not yet supported.\n\n\nTry one of the following options instead:\n\n\n\`/hypedocs add [hype/goal]\` to add a new hype or goal.\n\n\`/hypedocs list [hypes/goals]\` to list your hypes or goals.`;
+  let commandNotFoundText = `Unfortunately the command you entered, \`${command}\`, is not yet supported.\n\n\nTry one of the following options instead:\n\n\n\`/hype add [hype/goal]\` to add a new hype or goal.\n\n\`/hypedocs list [hypes/goals]\` to list your hypes or goals.`;
 
   const res = await slackApi("views.open", authToken, {
     trigger_id,

@@ -12,7 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "@netlify/functions": "^1.2.0",
-    "@notionhq/client": "^2.2.0",
     "env-paths": "^3.0.0",
     "firebase": "^9.12.1",
     "firebase-admin": "^11.2.0",
