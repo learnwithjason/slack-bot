@@ -44,7 +44,6 @@ export const handler: Handler = async (event) => {
 
     // 0-6, 0 = Sunday
     let day = new Date().getDay();
-    console.log(day);
 
     // if (day == 2 || day == 4) {
     if (day == 230) {

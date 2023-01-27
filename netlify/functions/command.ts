@@ -20,7 +20,6 @@ import {
 } from "./utils/user";
 
 export const handler: Handler = async (event) => {
-  console.log(`inside command`);
   if (!event.body) {
     return {
       statusCode: 500,
@@ -33,13 +32,10 @@ export const handler: Handler = async (event) => {
   if (!text || !user_id || !team_id) {
     return { statusCode: 500, body: "Error: missing parameters" };
   }
-  console.log(`text: ${text} | user_id: ${user_id} | team_id: ${team_id}`);
 
   // get slack token
   const slackResp = await getSlackAccount(team_id);
-  console.log(`slackResp: ${JSON.stringify(slackResp)}`);
   if (slackResp.length !== 1) {
-    console.log("slackResp.length !== 1");
     // TODO(aashni): change this to a generic error message instead
     await userNotFoundCommand(body, "email", "authToken");
     return {
@@ -47,7 +43,6 @@ export const handler: Handler = async (event) => {
       body: "Slack Authentication failed",
     };
   }
-  console.log("user found");
 
   const AUTH_TOKEN = slackResp[0].access_token;
   const WINS_CHANNEL_ID = slackResp[0].wins_channel_id;
@@ -57,11 +52,8 @@ export const handler: Handler = async (event) => {
   // check if user exists
   const email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
   const hypeUser = await getUserByEmail(email);
-  console.log(`email: ${email}`);
-  console.log(`hypeUser: ${JSON.stringify(hypeUser)}`);
 
   if (hypeUser.length < 1) {
-    console.log("hypeuser.length < 1");
     await userNotFoundCommand(body, email, AUTH_TOKEN);
 
     return {
@@ -71,12 +63,10 @@ export const handler: Handler = async (event) => {
   }
 
   let action = getActionFromText(text);
-  console.log(`action: ${action}`);
 
   let res;
 
   if (action === SLACK_ACTIONS.ADD_HYPE) {
-    console.log("go to addHypeCommand");
     res = await addHypeCommand(
       body,
       hypeUser,
@@ -85,7 +75,6 @@ export const handler: Handler = async (event) => {
       WINS_CHANNEL_NAME
     );
   } else if (action === SLACK_ACTIONS.ADD_GOAL) {
-    console.log("go to addGoalCommand");
     res = await addGoalCommand(
       body,
       AUTH_TOKEN,
@@ -93,13 +82,10 @@ export const handler: Handler = async (event) => {
       WINS_CHANNEL_NAME
     );
   } else if (action === SLACK_ACTIONS.LIST_HYPE) {
-    console.log("go to listHypeCommand");
     res = await listHypeCommand(body, hypeUser[0], AUTH_TOKEN);
   } else if (action === SLACK_ACTIONS.LIST_GOAL) {
-    console.log("go to listGoalCommand");
     res = await listGoalCommand(body, hypeUser[0], AUTH_TOKEN);
   } else {
-    console.log("go to commandNotFoundCommand");
     res = await commandNotFoundCommand(body, hypeUser[0], AUTH_TOKEN, text);
   }
 
@@ -183,8 +169,6 @@ const userNotFoundCommand = async (body, email, authToken) => {
     },
   });
 
-  console.log(res);
-
   return {
     statusCode: 200,
     body: "",
@@ -224,8 +208,6 @@ const commandNotFoundCommand = async (body, email, authToken, command) => {
       ],
     },
   });
-
-  console.log(res);
 
   return res;
 };
@@ -386,8 +368,6 @@ const addHypeCommand = async (
     },
   });
 
-  console.log(res);
-
   return res;
 };
 
@@ -483,7 +463,6 @@ const addGoalCommand = async (body, authToken, slackName, winChannelName) => {
     },
   });
 
-  console.log(res);
   return res;
 };
 

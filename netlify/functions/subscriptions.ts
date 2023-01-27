@@ -27,12 +27,9 @@ export const handler: Handler = async (event) => {
   const bodyEvent = body.event;
 
   const action = await getActionFromSubscription(bodyEvent.type);
-  console.log(`action: ${action}`);
 
   if (action === SLACK_ACTIONS.URL_VERIFICATION) {
   } else if (action === SLACK_ACTIONS.APP_HOME_OPENED) {
-    console.log(`app home opened, do things`);
-    console.log(`body: ${JSON.stringify(body)}`);
   } else if (action === SLACK_ACTIONS.ACTION_ERROR) {
     return {
       statusCode: 200,
