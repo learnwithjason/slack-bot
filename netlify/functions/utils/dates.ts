@@ -8,7 +8,7 @@ export const getFormattedDateYYYYMMDD = (date) => {
 };
 
 export const convertYYYYMMDDToTimestamp = (date) => {
-  return new Date(date).getTime() / 1000;
+  return new Date(date).getTime();
 };
 
 export const convertTimestampToYYYYMMDD = (timestamp) => {
