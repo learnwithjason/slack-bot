@@ -45,17 +45,22 @@ export const acknowledgeAction = async (
 };
 
 export const dailyBoostGeneric = async (userId, name, authToken) => {
+  console.log(`inside dailyBoostGeneric for userId: ${userId}`);
   return await slackApi("chat.postMessage", authToken, {
     channel: userId,
-    // user: userId,
+    user: userId,
     text: `Hey ${name}. You know you're awesome, and we know you're awesome! Start adding your wins to your HypeDoc today!\n\nUse \`/hype add hype\` to add a win now!`,
   }).catch((error) => console.log(error.message));
 };
 
 export const dailyBoostHype = async (userId, name, hype, authToken) => {
+  console.log(
+    `userId: ${userId} | name: ${name} | hype: ${hype} | authToken: ${authToken}`
+  );
+  console.log(`inside dailyBoostHype for userId: ${userId} | hype: ${hype}`);
   return await slackApi("chat.postMessage", authToken, {
     channel: userId,
-    // user: userId,
+    user: userId,
     text: `Hey ${name}! Remember that time you: :tada::tada: _*${hype}*_ :tada::tada:\n\nYou're *awesome*! Add your latest achievements using \`/hype add hype\`!`,
   }).catch((error) => console.log(error.message));
 };

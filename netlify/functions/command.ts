@@ -20,6 +20,7 @@ import {
 } from "./utils/user";
 
 export const handler: Handler = async (event) => {
+  console.log(`we are here`);
   if (!event.body) {
     return {
       statusCode: 500,
@@ -35,6 +36,7 @@ export const handler: Handler = async (event) => {
 
   // get slack token
   const slackResp = await getSlackAccount(team_id);
+  console.log(`slackResp: ${JSON.stringify(slackResp)}`);
   if (slackResp.length !== 1) {
     // TODO(aashni): change this to a generic error message instead
     await userNotFoundCommand(body, "email", "authToken");
@@ -52,6 +54,7 @@ export const handler: Handler = async (event) => {
   // check if user exists
   const email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
   const hypeUser = await getUserByEmail(email);
+  console.log(`email: ${email} | hypeUser: ${JSON.stringify(hypeUser)}`);
 
   if (hypeUser.length < 1) {
     await userNotFoundCommand(body, email, AUTH_TOKEN);
@@ -62,7 +65,11 @@ export const handler: Handler = async (event) => {
     };
   }
 
+  console.log(`here, action: ${text}`);
+
   let action = getActionFromText(text);
+
+  console.log(`slack actions: ${action}`);
 
   let res;
 
