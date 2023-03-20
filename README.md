@@ -63,10 +63,10 @@ ntl dev --live
 
 ## Production URLS to update on Slack
 
-- https://api.slack.com/apps/A047M3JV3A9/interactive-messages
-- https://api.slack.com/apps/A047M3JV3A9/slash-commands
-- https://api.slack.com/apps/A047M3JV3A9/event-subscriptions
-- Get shareable URL Link: https://app.slack.com/app-settings/T99HD5M6D/A047M3JV3A9/distribute
+- https://api.slack.com/apps/A04V1TG4RBK/interactive-messages
+- https://api.slack.com/apps/A04V1TG4RBK/slash-commands
+- https://api.slack.com/apps/A04V1TG4RBK/event-subscriptions
+- Get shareable URL Link: https://app.slack.com/app-settings/T99HD5M6D/A04V1TG4RBK/distribute
 
 ## Staging URLS to update on Slack
 
@@ -74,3 +74,10 @@ ntl dev --live
 - https://api.slack.com/apps/A01SU20000G/slash-commands
 - https://api.slack.com/apps/A01SU20000G/event-subscriptions
 - Get shareable URL Link: https://app.slack.com/app-settings/T019JD5PLKC/A01SU20000G/distribute
+
+## Local URLS to update on Slack
+
+- https://api.slack.com/apps/A047M3JV3A9/interactive-messages
+- https://api.slack.com/apps/A047M3JV3A9/slash-commands
+- https://api.slack.com/apps/A047M3JV3A9/event-subscriptions
+- Get shareable URL Link: https://app.slack.com/app-settings/T99HD5M6D/A047M3JV3A9/distribute
