@@ -45,7 +45,6 @@ export const acknowledgeAction = async (
 };
 
 export const dailyHypeBoostGeneric = async (userId, name, authToken) => {
-  console.log(`inside dailyHypeBoostGeneric for userId: ${userId}`);
   return await slackApi("chat.postMessage", authToken, {
     channel: userId,
     user: userId,
@@ -54,10 +53,6 @@ export const dailyHypeBoostGeneric = async (userId, name, authToken) => {
 };
 
 export const dailyBoostHype = async (userId, name, hype, authToken) => {
-  console.log(
-    `userId: ${userId} | name: ${name} | hype: ${hype} | authToken: ${authToken}`
-  );
-  console.log(`inside dailyBoostHype for userId: ${userId} | hype: ${hype}`);
   return await slackApi("chat.postMessage", authToken, {
     channel: userId,
     user: userId,
@@ -66,7 +61,6 @@ export const dailyBoostHype = async (userId, name, hype, authToken) => {
 };
 
 export const dailyGoalBoostGeneric = async (userId, name, authToken) => {
-  console.log(`inside dailyGoalBoostGeneric for userId: ${userId}`);
   return await slackApi("chat.postMessage", authToken, {
     channel: userId,
     user: userId,

@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 const firestore = firebaseAdmin.firestore();
 
 export const getSlackAccount = async (teamId) => {
-  console.log(`teamId: ${teamId}`);
   return firestore
     .collection("slack")
     .where("team_id", "==", teamId)
@@ -91,7 +90,6 @@ const randomGoalQuery = async (randomId, comparator) => {
 };
 
 export const getRandomHypeForUser = async (uid) => {
-  console.log(`getRandomHypeForUser, uid: ${uid}`);
   let randomId = uuidv4();
 
   return await randomHypeQuery(randomId, ">=", uid).then(async (result) => {
