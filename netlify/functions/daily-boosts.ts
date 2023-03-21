@@ -1,6 +1,7 @@
 import type { Handler } from "@netlify/functions";
 import {
-  dailyBoostGeneric,
+  dailyHypeBoostGeneric,
+  dailyGoalBoostGeneric,
   dailyBoostGoal,
   dailyBoostHype,
   dailyBoostMotivation,
@@ -13,6 +14,7 @@ import {
   getUserByEmail,
   getUserHypes,
 } from "./utils/db";
+import { getRandomQuote } from "./utils/quotes";
 
 /**
  * Send daily boosts to users based on submitted hypes and goals
@@ -40,14 +42,11 @@ export const handler: Handler = async (event) => {
   let usersOnSlack = await getUsersOnSlack();
 
   Object.keys(usersOnSlack).map(async (user) => {
-    // console.log(
-    //   `user: ${user} | usersOnSlack[user]: ${JSON.stringify(
-    //     usersOnSlack[user]
-    //   )}`
-    // );
     let userInfo = usersOnSlack[user].user_info;
     let slackInfo = usersOnSlack[user].slack_accounts;
-    await hypeBoost(userInfo, slackInfo);
+    // await hypeBoost(userInfo, slackInfo);
+    // await goalBoost(userInfo, slackInfo);
+    await motivationalBoost(userInfo, slackInfo);
 
     //   // 0-6, 0 = Sunday
     // let day = new Date().getDay();
@@ -94,7 +93,7 @@ export const handler: Handler = async (event) => {
 
   return {
     statusCode: 200,
-    body: `Success: ${JSON.stringify(usersOnSlack)}`,
+    body: `Success`,
   };
 };
 
@@ -129,91 +128,54 @@ const getUsersOnSlack = async () => {
 const hypeBoost = async (user, slack) => {
   console.log(`\n\n>>>>>>>>>>>>>>>>>>>>>>>>\n\n`);
   console.log(`slack: ${JSON.stringify(slack)}`);
-  // console.log(`hypeboost, user: ${JSON.stringify(user)}`);
   let selectedHype = await getRandomHypeForUser(user.user_id);
-  // console.log(
-  //   `\nuser: ${user.user_id} | selectedHype: ${JSON.stringify(selectedHype)}\n`
-  // );
 
   if (selectedHype.length === 0) {
     // default case, user has no hypes so send a generic prompt
-    let resp = await dailyBoostGeneric(
+    dailyHypeBoostGeneric(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
       slack[0].access_token
     );
-    console.log(`resp: ${JSON.stringify(resp)}\n\n`);
   } else {
-    let resp = await dailyBoostHype(
+    dailyBoostHype(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
       selectedHype[0].title,
       slack[0].access_token
     );
-    console.log(`resp: ${JSON.stringify(resp)}\n\n`);
   }
-
-  // if (!selectedHype) {
-  //   // default in case no hype found, use generic prompt
-  //   dailyBoostGeneric(HARDCODED_USER_ID, "Aashni", HARDCODED_AUTH_TOKEN);
-  // } else {
-  //   // update message if Hype was found
-  //   dailyBoostHype(
-  //     HARDCODED_USER_ID,
-  //     "Aashni",
-  //     selectedHype[0].title,
-  //     HARDCODED_AUTH_TOKEN
-  //   );
-  // }
 };
 
-// const hypeBoost = async (user) => {
-//   let selectedHype = await getRandomHypeForUser(user.id);
-
-//   if (!selectedHype) {
-//     // default in case no hype found, use generic prompt
-//     dailyBoostGeneric(HARDCODED_USER_ID, "Aashni", HARDCODED_AUTH_TOKEN);
-//   } else {
-//     // update message if Hype was found
-//     dailyBoostHype(
-//       HARDCODED_USER_ID,
-//       "Aashni",
-//       selectedHype[0].title,
-//       HARDCODED_AUTH_TOKEN
-//     );
-//   }
-// };
-
-const goalBoost = async (user) => {
-  let selectedGoal = await getRandomGoalForUser(user.id);
+const goalBoost = async (user, slack) => {
+  let selectedGoal = await getRandomGoalForUser(user.user_id);
 
   if (!selectedGoal) {
     // default in case no hype found, use generic prompt
-    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni", HARDCODED_AUTH_TOKEN);
+
+    dailyGoalBoostGeneric(
+      user.user_slack_id,
+      user.name ? user.name : user.slack_username,
+      slack[0].access_token
+    );
   } else {
     // update message if Hype was found
     dailyBoostGoal(
-      HARDCODED_USER_ID,
-      "Aashni",
+      user.user_slack_id,
+      user.name ? user.name : user.slack_username,
       selectedGoal[0].title,
-      HARDCODED_AUTH_TOKEN
+      slack[0].access_token
     );
   }
 };
 
-const motivationalBoost = async (user) => {
-  let motivationalBoost = "This is a motivational boost";
+const motivationalBoost = async (user, slack) => {
+  let motivationalBoost = getRandomQuote();
 
-  if (!motivationalBoost) {
-    // default in case no hype found, use generic prompt
-    dailyBoostGeneric(HARDCODED_USER_ID, "Aashni", HARDCODED_AUTH_TOKEN);
-  } else {
-    // update message if Hype was found
-    dailyBoostMotivation(
-      HARDCODED_USER_ID,
-      "Aashni",
-      HARDCODED_AUTH_TOKEN,
-      motivationalBoost
-    );
-  }
+  dailyBoostMotivation(
+    user.user_slack_id,
+    user.name ? user.name : user.slack_username,
+    motivationalBoost,
+    slack[0].access_token
+  );
 };
