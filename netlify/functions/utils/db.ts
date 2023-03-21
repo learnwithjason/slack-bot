@@ -55,10 +55,24 @@ export const getUserHypes = async (uid, limit = 0) => {
     .then(format);
 };
 
-const randomHypeQuery = async (randomId, comparator) => {
+// TODO(aashni): add a flag to see if the Slack Account is active or old
+export const getSlackAccounts = async () => {
+  return firestore.collection("slack").get().then(format);
+};
+
+export const getSlackUsers = async (slackId) => {
+  return firestore
+    .collection("slackUsers")
+    .where("slack_id", "==", slackId)
+    .get()
+    .then(format);
+};
+
+const randomHypeQuery = async (randomId, comparator, userId) => {
   return firestore
     .collection("hypeEvents")
     .where("currentStatus", "==", "ACTIVE")
+    .where("user_id", "==", userId)
     .where(firebaseAdmin.firestore.FieldPath.documentId(), comparator, randomId)
     .limit(1)
     .get()
@@ -78,11 +92,11 @@ const randomGoalQuery = async (randomId, comparator) => {
 export const getRandomHypeForUser = async (uid) => {
   let randomId = uuidv4();
 
-  return await randomHypeQuery(randomId, ">=").then(async (result) => {
+  return await randomHypeQuery(randomId, ">=", uid).then(async (result) => {
     if (result.length > 0) {
       return result;
     } else {
-      return await randomHypeQuery(randomId, "<=");
+      return await randomHypeQuery(randomId, "<=", uid);
     }
   });
 };
