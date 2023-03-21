@@ -1,4 +1,5 @@
 import type { Handler } from "@netlify/functions";
+import { schedule } from "@netlify/functions";
 import {
   dailyHypeBoostGeneric,
   dailyGoalBoostGeneric,
@@ -11,8 +12,6 @@ import {
   getRandomHypeForUser,
   getSlackAccounts,
   getSlackUsers,
-  getUserByEmail,
-  getUserHypes,
 } from "./utils/db";
 import { getRandomQuote } from "./utils/quotes";
 
@@ -36,60 +35,27 @@ let HARDCODED_USERS = ["contact@aashni.me"];
 let HARDCODED_USER_ID = "U9A18B2M9";
 let HARDCODED_AUTH_TOKEN = process.env.SLACK_BOT_OAUTH_TOKEN;
 
-export const handler: Handler = async (event) => {
-  console.log(`inside daily-boosts`);
-
+const dailyBoosts: Handler = async (event) => {
   let usersOnSlack = await getUsersOnSlack();
 
   Object.keys(usersOnSlack).map(async (user) => {
     let userInfo = usersOnSlack[user].user_info;
     let slackInfo = usersOnSlack[user].slack_accounts;
-    // await hypeBoost(userInfo, slackInfo);
-    // await goalBoost(userInfo, slackInfo);
-    await motivationalBoost(userInfo, slackInfo);
 
-    //   // 0-6, 0 = Sunday
-    // let day = new Date().getDay();
+    // 0-6 for days of the week, 0 = Sunday
+    // mon, thurs = goals, tues, fri = hypes, wed = motivation
+    let day = new Date().getDay();
 
-    // // if (day == 2 || day == 4) {
-    // if (day == 230) {
-    //   hypeBoost(user);
-    //   // } else if (day == 1 || day == 3) {
-    // } else if (day == 0) {
-    //   goalBoost(user);
-    // } else {
-    //   motivationalBoost(user);
-    // }
+    if (day === 2 || day === 5) {
+      hypeBoost(userInfo, slackInfo);
+    } else if (day === 1 || day === 4) {
+      goalBoost(userInfo, slackInfo);
+    } else if (day === 3) {
+      motivationalBoost(userInfo, slackInfo);
+    } else {
+      // weekend, don't send a boost message out
+    }
   });
-
-  // console.log(`usersOnSlack: ${JSON.stringify(usersOnSlack)}`);
-
-  // usersOnSlack.forEach(async (user) => {
-  //   console.log(`user: ${JSON.stringify(user)}`);
-  // });
-
-  // HARDCODED_USERS.forEach(async (email) => {
-  //   // get user id
-  //   let userFromDb = await getUserByEmail(email);
-
-  //   if (!userFromDb) {
-  //     // continue to next loop as this user could not be found
-  //     return;
-  //   }
-
-  //   // 0-6, 0 = Sunday
-  //   let day = new Date().getDay();
-
-  //   // if (day == 2 || day == 4) {
-  //   if (day == 230) {
-  //     hypeBoost(userFromDb[0]);
-  //     // } else if (day == 1 || day == 3) {
-  //   } else if (day == 0) {
-  //     goalBoost(userFromDb[0]);
-  //   } else {
-  //     motivationalBoost(userFromDb[0]);
-  //   }
-  // });
 
   return {
     statusCode: 200,
@@ -118,7 +84,6 @@ const getUsersOnSlack = async () => {
           slack_accounts: [slackAccount],
         };
       }
-      console.log(`allSlackUsers: ${JSON.stringify(allSlackUsers)}`);
     }
   }
 
@@ -126,8 +91,6 @@ const getUsersOnSlack = async () => {
 };
 
 const hypeBoost = async (user, slack) => {
-  console.log(`\n\n>>>>>>>>>>>>>>>>>>>>>>>>\n\n`);
-  console.log(`slack: ${JSON.stringify(slack)}`);
   let selectedHype = await getRandomHypeForUser(user.user_id);
 
   if (selectedHype.length === 0) {
@@ -179,3 +142,6 @@ const motivationalBoost = async (user, slack) => {
     slack[0].access_token
   );
 };
+
+// schedule this to run every weekday at 12 noon GMT, 10am EST
+export const handler = schedule("7 15 * * 1-5", dailyBoosts);
