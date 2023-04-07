@@ -28,8 +28,9 @@ export const handler: Handler = async (event) => {
   }
 
   const body = parse(event.body);
+  console.log(body, null, 2);
   const { text, user_id, team_id } = body;
-  if (!text || !user_id || !team_id) {
+  if (!user_id || !team_id) {
     return { statusCode: 500, body: "Error: missing parameters" };
   }
 
@@ -63,10 +64,19 @@ export const handler: Handler = async (event) => {
   }
 
   let action = getActionFromText(text);
+  console.log(`action: ${action}`);
 
   let res;
 
-  if (action === SLACK_ACTIONS.ADD_HYPE) {
+  if (action === SLACK_ACTIONS.BASE_ACTION) {
+    res = await baseHypeCommand(
+      body,
+      hypeUser,
+      AUTH_TOKEN,
+      SLACK_DATA.team_name,
+      WINS_CHANNEL_NAME
+    );
+  } else if (action === SLACK_ACTIONS.ADD_HYPE) {
     res = await addHypeCommand(
       body,
       hypeUser,
@@ -210,6 +220,120 @@ const commandNotFoundCommand = async (body, email, authToken, command) => {
   });
 
   return res;
+};
+
+const baseHypeCommand = async (
+  body,
+  hypeUser,
+  authToken,
+  slackName,
+  winChannelName
+) => {
+  const { trigger_id } = body;
+
+  const res = await slackApi("views.open", authToken, {
+    trigger_id,
+    view: {
+      type: "modal",
+      title: {
+        type: "plain_text",
+        text: "How to Use HypeDocs",
+      },
+      callback_id: "base-hype",
+      blocks: [
+        {
+          type: "header",
+          text: {
+            type: "plain_text",
+            text: ":tada: Let's Get Hyped :tada:",
+          },
+        },
+        {
+          type: "divider",
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: " :loud_sound: *How to get started* :loud_sound:",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "HypeDocs is here to help you create goals, track your small and big wins (we call these Hypes!) and celebrate with your team.",
+          },
+        },
+        {
+          type: "divider",
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: ":boom: |   *HYPES*  | :boom: ",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "`/hype add hype` *Add Hypes* _ use this command to add a hype to your HypeDoc_",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "`/hype list hypes` *List Hypes* _ use this command to see the most recent hypes in your HypeDoc_",
+          },
+        },
+        {
+          type: "divider",
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: ":large_green_circle: |   *GOALS*  | :large_green_circle: ",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "`/hype add goal` *Add Goals* _ use this command to add goals to your HypeDoc_",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "`/hype list goals` *List Goals* _ use this command to list the most recent goals in your HypeDoc_",
+          },
+        },
+        {
+          type: "divider",
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "*More coming soon!*",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "We're hard at work building out more awesome features for you. Have a request or feedback? Let us know at contact@hypedocs.co!",
+            verbatim: false,
+          },
+        },
+      ],
+    },
+  });
 };
 
 const addHypeCommand = async (
