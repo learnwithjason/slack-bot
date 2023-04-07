@@ -3,10 +3,13 @@ import { goalStates, SLACK_ACTIONS } from "./enums";
 import { slackApi } from "./slack";
 
 export const getActionFromText = (text) => {
+  console.log(`inside getActionFromText, text: ${text}`);
   let action = "";
 
   if (text === "" || text === undefined) {
-    action = SLACK_ACTIONS.NO_ACTION;
+    console.log("setting base text");
+    action = SLACK_ACTIONS.BASE_ACTION;
+    return action;
   }
 
   const words = text.split(" ");
