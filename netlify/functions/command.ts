@@ -392,7 +392,7 @@ const addGoalCommand = async (body, authToken, slackName, winChannelName) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "Fill out this form to add a new Goal to your HypeDoc! Or, if you prefer, you can <https://hypedocs.co|goals add your goal through the browser>.",
+            text: "Submit this form to add a new Goal to your HypeDoc! Or, if you prefer, you can <https://hypedocs.co|goals add your goal through the browser>.",
           },
         },
         {
