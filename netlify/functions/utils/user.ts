@@ -141,7 +141,8 @@ export const formatHypesForSlackMessage = async (hypes) => {
   }
 
   let messageList = hypes.map(
-    (hype, key) => `${key + 1}. *${hype.title}* - ${hype.description}`
+    (hype, key) =>
+      `*${hype.title}* - <https://hypedocs.co/hype/${hype.id}|see more>`
   );
   listHypeMessage = listHypeMessage + "\n\n" + messageList.join("\n");
 
@@ -158,8 +159,6 @@ export const formatGoalsForSlackMessage = async (goals) => {
     listGoalMessage = `You haven't added any goals yet. Add some now by typing \`/hype add goal\` or through the <https://hypedocs.co/home|hypedocs.co website> :tada::tada:`;
     return listGoalMessage;
   }
-
-  // :large_purple_circle: :large_green_circle:
 
   let messageList = goals.map(
     (goal) =>
