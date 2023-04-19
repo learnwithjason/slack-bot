@@ -28,7 +28,6 @@ export const handler: Handler = async (event) => {
   }
 
   const body = parse(event.body);
-  console.log(body, null, 2);
   const { text, user_id, team_id } = body;
   if (!user_id || !team_id) {
     return { statusCode: 500, body: "Error: missing parameters" };
@@ -596,7 +595,7 @@ const listHypeCommand = async (body, hypeUser, authToken) => {
   const userHypes = await getUserHypes(hypeUser.uid, 7);
   const slackMessage = await formatHypesForSlackMessage(userHypes);
 
-  await listGoalsMessage(user_id, slackMessage, authToken);
+  await listHypesMessage(user_id, slackMessage, authToken);
 
   return {
     statusCode: 200,
