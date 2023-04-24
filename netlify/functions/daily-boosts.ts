@@ -1,5 +1,5 @@
 import type { Handler } from "@netlify/functions";
-import { schedule } from "@netlify/functions";
+// import { schedule } from "@netlify/functions";
 import {
   dailyHypeBoostGeneric,
   dailyGoalBoostGeneric,
@@ -35,9 +35,12 @@ let HARDCODED_USERS = ["contact@aashni.me"];
 let HARDCODED_USER_ID = "U9A18B2M9";
 let HARDCODED_AUTH_TOKEN = process.env.SLACK_BOT_OAUTH_TOKEN;
 
-const dailyBoosts: Handler = async (event) => {
+// const dailyBoosts: Handler = async (event) => {
+export const handler: Handler = async (event) => {
+  console.log(`inside dailyBoosts, event: ${JSON.stringify(event)}`);
   let usersOnSlack = await getUsersOnSlack();
 
+  console.log(`usersOnSlack: ${JSON.stringify(usersOnSlack)}`);
   Object.keys(usersOnSlack).map(async (user) => {
     let userInfo = usersOnSlack[user].user_info;
     let slackInfo = usersOnSlack[user].slack_accounts;
@@ -46,7 +49,8 @@ const dailyBoosts: Handler = async (event) => {
     // mon, thurs = goals, tues, fri = hypes, wed = motivation
     let day = new Date().getDay();
 
-    if (day === 2 || day === 5) {
+    // if (day === 2 || day === 5) {
+    if (true) {
       hypeBoost(userInfo, slackInfo);
     } else if (day === 1 || day === 4) {
       goalBoost(userInfo, slackInfo);
@@ -91,9 +95,12 @@ const getUsersOnSlack = async () => {
 };
 
 const hypeBoost = async (user, slack) => {
+  console.log(`inside hypeBoost`);
   let selectedHype = await getRandomHypeForUser(user.user_id);
+  console.log(`selectedHype: ${JSON.stringify(selectedHype)}`);
 
   if (selectedHype.length === 0) {
+    console.log(`no hype`);
     // default case, user has no hypes so send a generic prompt
     dailyHypeBoostGeneric(
       user.user_slack_id,
@@ -101,6 +108,7 @@ const hypeBoost = async (user, slack) => {
       slack[0].access_token
     );
   } else {
+    console.log(`hype: ${selectedHype[0].title}`);
     dailyBoostHype(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
@@ -144,4 +152,4 @@ const motivationalBoost = async (user, slack) => {
 };
 
 // schedule this to run every weekday at 12 noon GMT, 10am EST
-export const handler = schedule("7 15 * * 1-5", dailyBoosts);
+// export const handler = schedule("7 15 * * 1-5", dailyBoosts);
