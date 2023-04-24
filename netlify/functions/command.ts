@@ -63,7 +63,6 @@ export const handler: Handler = async (event) => {
   }
 
   let action = getActionFromText(text);
-  console.log(`action: ${action}`);
 
   let res;
 
@@ -98,8 +97,7 @@ export const handler: Handler = async (event) => {
     res = await commandNotFoundCommand(body, hypeUser[0], AUTH_TOKEN, text);
   }
 
-  // TODO(aashni): Check if res has any errors, otherwise return 200
-  return res;
+  return returnRes(res);
 };
 
 // HELPER FUNCTIONS
@@ -178,10 +176,7 @@ const userNotFoundCommand = async (body, email, authToken) => {
     },
   });
 
-  return {
-    statusCode: 200,
-    body: "",
-  };
+  return res;
 };
 
 const commandNotFoundCommand = async (body, email, authToken, command) => {
@@ -333,6 +328,8 @@ const baseHypeCommand = async (
       ],
     },
   });
+
+  return res;
 };
 
 const addHypeCommand = async (
@@ -595,12 +592,9 @@ const listHypeCommand = async (body, hypeUser, authToken) => {
   const userHypes = await getUserHypes(hypeUser.uid, 7);
   const slackMessage = await formatHypesForSlackMessage(userHypes);
 
-  await listHypesMessage(user_id, slackMessage, authToken);
+  const res = await listHypesMessage(user_id, slackMessage, authToken);
 
-  return {
-    statusCode: 200,
-    body: "",
-  };
+  return res;
 };
 
 const listGoalCommand = async (body, hypeUser, authToken) => {
@@ -610,10 +604,21 @@ const listGoalCommand = async (body, hypeUser, authToken) => {
 
   const slackMessage = await formatGoalsForSlackMessage(userHypes);
 
-  await listHypesMessage(user_id, slackMessage, authToken);
+  const res = await listHypesMessage(user_id, slackMessage, authToken);
 
-  return {
-    statusCode: 200,
-    body: "",
-  };
+  return res;
+};
+
+const returnRes = (res) => {
+  if (res && res["ok"]) {
+    return {
+      statusCode: 200,
+      body: "",
+    };
+  } else {
+    return {
+      statusCode: 500,
+      body: "There was an error running this command. Try again or contact HypeDocs Support.",
+    };
+  }
 };

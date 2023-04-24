@@ -88,7 +88,7 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*:tada: _${slackData.title}!_ :tada:* - <@${payload.user.id}>'s latest hype!`,
+            text: `*:tada: _${slackData.title}!_ :tada:* - <@${payload.user.id}>'s latest hype!\n_${slackData.description}_`,
           },
         },
       ],
@@ -129,7 +129,7 @@ const addGoalAction = async (payload, authToken, winsChannelId) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*:tada: _${slackData.title}!_ :tada:* - <@${payload.user.id}>'s newest goal!`,
+            text: `*:tada: _${slackData.title}!_ :tada:* - <@${payload.user.id}>'s newest goal!\n_${slackData.description}_`,
           },
         },
       ],
