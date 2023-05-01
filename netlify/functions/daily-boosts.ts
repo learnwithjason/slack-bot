@@ -37,11 +37,12 @@ let HARDCODED_AUTH_TOKEN = process.env.SLACK_BOT_OAUTH_TOKEN;
 
 // const dailyBoosts: Handler = async (event) => {
 export const handler: Handler = async (event) => {
-  console.log(`inside dailyBoosts, event: ${JSON.stringify(event)}`);
+  console.log(`start of daily boost flow`);
   let usersOnSlack = await getUsersOnSlack();
 
-  console.log(`usersOnSlack: ${JSON.stringify(usersOnSlack)}`);
-  Object.keys(usersOnSlack).map(async (user) => {
+  // creating an object of all the promises to ensure we execute
+  // all of them before return is called
+  const slackMessagesPromise = Object.keys(usersOnSlack).map(async (user) => {
     let userInfo = usersOnSlack[user].user_info;
     let slackInfo = usersOnSlack[user].slack_accounts;
 
@@ -49,17 +50,18 @@ export const handler: Handler = async (event) => {
     // mon, thurs = goals, tues, fri = hypes, wed = motivation
     let day = new Date().getDay();
 
-    // if (day === 2 || day === 5) {
-    if (true) {
-      hypeBoost(userInfo, slackInfo);
+    if (day === 2 || day === 5) {
+      await hypeBoost(userInfo, slackInfo);
     } else if (day === 1 || day === 4) {
-      goalBoost(userInfo, slackInfo);
+      await goalBoost(userInfo, slackInfo);
     } else if (day === 3) {
-      motivationalBoost(userInfo, slackInfo);
+      await motivationalBoost(userInfo, slackInfo);
     } else {
       // weekend, don't send a boost message out
     }
   });
+
+  await Promise.all(slackMessagesPromise);
 
   return {
     statusCode: 200,
@@ -102,14 +104,14 @@ const hypeBoost = async (user, slack) => {
   if (selectedHype.length === 0) {
     console.log(`no hype`);
     // default case, user has no hypes so send a generic prompt
-    dailyHypeBoostGeneric(
+    await dailyHypeBoostGeneric(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
       slack[0].access_token
     );
   } else {
     console.log(`hype: ${selectedHype[0].title}`);
-    dailyBoostHype(
+    await dailyBoostHype(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
       selectedHype[0].title,
@@ -124,14 +126,14 @@ const goalBoost = async (user, slack) => {
   if (!selectedGoal) {
     // default in case no hype found, use generic prompt
 
-    dailyGoalBoostGeneric(
+    await dailyGoalBoostGeneric(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
       slack[0].access_token
     );
   } else {
     // update message if Hype was found
-    dailyBoostGoal(
+    await dailyBoostGoal(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
       selectedGoal[0].title,
@@ -143,7 +145,7 @@ const goalBoost = async (user, slack) => {
 const motivationalBoost = async (user, slack) => {
   let motivationalBoost = getRandomQuote();
 
-  dailyBoostMotivation(
+  await dailyBoostMotivation(
     user.user_slack_id,
     user.name ? user.name : user.slack_username,
     motivationalBoost,
