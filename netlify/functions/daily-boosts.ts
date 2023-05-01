@@ -14,6 +14,7 @@ import {
   getSlackUsers,
 } from "./utils/db";
 import { getRandomQuote } from "./utils/quotes";
+import { getTodaysDay } from "./utils/dates";
 
 /**
  * Send daily boosts to users based on submitted hypes and goals
@@ -51,7 +52,7 @@ const dailyBoosts: Handler = async (event) => {
 
     // 0-6 for days of the week, 0 = Sunday
     // mon, thurs = goals, tues, fri = hypes, wed = motivation
-    let day = new Date().getDay();
+    let day = getTodaysDay();
 
     if (day === 2 || day === 5) {
       await hypeBoost(userInfo, slackInfo);
@@ -100,12 +101,11 @@ const getUsersOnSlack = async () => {
 };
 
 const hypeBoost = async (user, slack) => {
-  console.log(`inside hypeBoost`);
   let selectedHype = await getRandomHypeForUser(user.user_id);
   console.log(`selectedHype: ${JSON.stringify(selectedHype)}`);
 
   if (selectedHype.length === 0) {
-    console.log(`no hype`);
+    console.log(`sending generic hype to: ${user.name}`);
     // default case, user has no hypes so send a generic prompt
     await dailyHypeBoostGeneric(
       user.user_slack_id,
@@ -113,7 +113,7 @@ const hypeBoost = async (user, slack) => {
       slack[0].access_token
     );
   } else {
-    console.log(`hype: ${selectedHype[0].title}`);
+    console.log(`sending hype to: ${user.name} - ${selectedHype[0].title}`);
     await dailyBoostHype(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
@@ -128,7 +128,7 @@ const goalBoost = async (user, slack) => {
 
   if (!selectedGoal) {
     // default in case no hype found, use generic prompt
-
+    console.log(`sending generic goal to: ${user.name}`);
     await dailyGoalBoostGeneric(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
@@ -136,6 +136,7 @@ const goalBoost = async (user, slack) => {
     );
   } else {
     // update message if Hype was found
+    console.log(`sending goal to: ${user.name} - ${selectedGoal[0].title}`);
     await dailyBoostGoal(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,

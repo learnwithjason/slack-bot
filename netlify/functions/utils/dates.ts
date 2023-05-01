@@ -8,7 +8,17 @@ export const getFormattedDateYYYYMMDD = (date) => {
 };
 
 export const convertYYYYMMDDToTimestamp = (date) => {
-  return new Date(date).getTime();
+  if (!date) {
+    return getTodaysDateAsTimestamp();
+  }
+
+  // input: 2023-04-29
+  let dateObj = date.split("-");
+  let year = dateObj[0];
+  let month = dateObj[1] - 1;
+  let day = dateObj[2];
+
+  return new Date(year, month, day).getTime();
 };
 
 export const convertTimestampToYYYYMMDD = (timestamp) => {
@@ -17,5 +27,13 @@ export const convertTimestampToYYYYMMDD = (timestamp) => {
 };
 
 export const getTodaysDateAsTimestamp = () => {
-  return new Date().getTime();
+  let today = new Date();
+  let year = today.getFullYear();
+  let month = today.getMonth();
+  let day = today.getDate();
+  return new Date(year, month, day).getTime();
+};
+
+export const getTodaysDay = () => {
+  return new Date().getDay();
 };
