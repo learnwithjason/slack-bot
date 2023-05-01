@@ -1,5 +1,5 @@
 import type { Handler } from "@netlify/functions";
-// import { schedule } from "@netlify/functions";
+import { schedule } from "@netlify/functions";
 import {
   dailyHypeBoostGeneric,
   dailyGoalBoostGeneric,
@@ -35,8 +35,11 @@ let HARDCODED_USERS = ["contact@aashni.me"];
 let HARDCODED_USER_ID = "U9A18B2M9";
 let HARDCODED_AUTH_TOKEN = process.env.SLACK_BOT_OAUTH_TOKEN;
 
-// const dailyBoosts: Handler = async (event) => {
-export const handler: Handler = async (event) => {
+// use this version for the scheduler - works for local calls as well
+const dailyBoosts: Handler = async (event) => {
+  // use this version to test the function directly in production
+  //  note: will need to deploy to production.
+  // export const handler: Handler = async (event) => {
   console.log(`start of daily boost flow`);
   let usersOnSlack = await getUsersOnSlack();
 
@@ -154,4 +157,4 @@ const motivationalBoost = async (user, slack) => {
 };
 
 // schedule this to run every weekday at 12 noon GMT, 10am EST
-// export const handler = schedule("7 15 * * 1-5", dailyBoosts);
+export const handler = schedule("7 14 * * 1-5", dailyBoosts);
