@@ -64,7 +64,6 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
   const slackData = {
     title: values.title_block.title.value,
     date: values.date_block.date.selected_date,
-    category: values.category_block.category.selected_option.value,
     goal: goal,
     description: values.description_block.description.value,
     sharing: values.sharing_block.sharing.selected_options,
@@ -111,6 +110,7 @@ const addGoalAction = async (payload, authToken, winsChannelId) => {
   const slackData = {
     title: values.title_block.title.value,
     description: values.description_block.description.value,
+    category: values.category_block.category.selected_option.value,
     sharing: values.sharing_block.sharing.selected_options,
   };
   let firebaseUser = await getFirebaseUserFromSlackUser(
