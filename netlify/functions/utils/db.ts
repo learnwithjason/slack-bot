@@ -71,17 +71,18 @@ export const getSlackUsers = async (slackId) => {
 const randomHypeQuery = async (randomId, comparator, userId) => {
   return firestore
     .collection("hypeEvents")
-    .where("currentStatus", "==", "ACTIVE")
     .where("user_id", "==", userId)
+    .where("currentStatus", "==", "ACTIVE")
     .where(firebaseAdmin.firestore.FieldPath.documentId(), comparator, randomId)
     .limit(1)
     .get()
     .then(format);
 };
 
-const randomGoalQuery = async (randomId, comparator) => {
+const randomGoalQuery = async (randomId, comparator, userId) => {
   return firestore
     .collection("goals")
+    .where("user_id", "==", userId)
     .where("currentGoalStatus", "==", "ACTIVE_GOAL")
     .where(firebaseAdmin.firestore.FieldPath.documentId(), comparator, randomId)
     .limit(1)
@@ -104,11 +105,11 @@ export const getRandomHypeForUser = async (uid) => {
 export const getRandomGoalForUser = async (uid) => {
   let randomId = uuidv4();
 
-  return await randomGoalQuery(randomId, ">=").then(async (result) => {
+  return await randomGoalQuery(randomId, ">=", uid).then(async (result) => {
     if (result.length > 0) {
       return result;
     } else {
-      return await randomGoalQuery(randomId, "<=");
+      return await randomGoalQuery(randomId, "<=", uid);
     }
   });
 };
