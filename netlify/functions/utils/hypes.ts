@@ -16,7 +16,6 @@ export const createNewHype = async (firebaseUser, slackData) => {
     date: getTodaysDateAsTimestamp(),
     dateHypeHappened: convertYYYYMMDDToTimestamp(slackData.date),
     description: slackData.description,
-    category: slackData.category || "",
     goal: slackData.goal || "",
     currentStatus: "ACTIVE",
   };
@@ -35,6 +34,7 @@ export const createNewGoal = async (firebaseUser, slackData) => {
     id: uuidv4(),
     user_id: firebaseUser.uid,
     title: slackData.title,
+    category: slackData.category || "",
     date: getTodaysDateAsTimestamp(),
     description: slackData.description,
     currentGoalStatus: "ACTIVE_GOAL",

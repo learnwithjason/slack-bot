@@ -341,7 +341,6 @@ const addHypeCommand = async (
 ) => {
   const { trigger_id } = body;
 
-  const categoryOptions = getCategoriesForSlack();
   const goalOptions = await getUserGoalOptionsFromFirebase(hypeUser[0].uid);
 
   const res = await slackApi("views.open", authToken, {
@@ -403,24 +402,6 @@ const addHypeCommand = async (
             type: "plain_text",
             text: "When did you accomplish this?",
             emoji: true,
-          },
-        },
-        {
-          block_id: "category_block",
-          type: "input",
-          label: {
-            type: "plain_text",
-            text: "How do you categorize this Hype?",
-          },
-          element: {
-            action_id: "category",
-            type: "static_select",
-            options: categoryOptions,
-            placeholder: {
-              type: "plain_text",
-              text: "Select a category",
-              emoji: true,
-            },
           },
         },
         {
@@ -494,6 +475,8 @@ const addHypeCommand = async (
 const addGoalCommand = async (body, authToken, slackName, winChannelName) => {
   const { trigger_id } = body;
 
+  const categoryOptions = getCategoriesForSlack();
+
   const res = await slackApi("views.open", authToken, {
     trigger_id,
     view: {
@@ -535,6 +518,24 @@ const addGoalCommand = async (body, authToken, slackName, winChannelName) => {
           hint: {
             type: "plain_text",
             text: "Your 1-liner for your goal",
+          },
+        },
+        {
+          block_id: "category_block",
+          type: "input",
+          label: {
+            type: "plain_text",
+            text: "How do you categorize this Hype?",
+          },
+          element: {
+            action_id: "category",
+            type: "static_select",
+            options: categoryOptions,
+            placeholder: {
+              type: "plain_text",
+              text: "Select a category",
+              emoji: true,
+            },
           },
         },
         {
