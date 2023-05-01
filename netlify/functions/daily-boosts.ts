@@ -14,6 +14,7 @@ import {
   getSlackUsers,
 } from "./utils/db";
 import { getRandomQuote } from "./utils/quotes";
+import { getTodaysDay } from "./utils/dates";
 
 /**
  * Send daily boosts to users based on submitted hypes and goals
@@ -51,7 +52,7 @@ const dailyBoosts: Handler = async (event) => {
 
     // 0-6 for days of the week, 0 = Sunday
     // mon, thurs = goals, tues, fri = hypes, wed = motivation
-    let day = new Date().getDay();
+    let day = getTodaysDay();
 
     if (day === 2 || day === 5) {
       await hypeBoost(userInfo, slackInfo);
