@@ -9,6 +9,7 @@ import {
   getActionFromCallback,
   getFirebaseUserFromSlackUser,
 } from "./utils/user";
+import { getItalizedString } from "./utils/utils";
 
 export const handler: Handler = async (event) => {
   if (!event.body) {
@@ -80,6 +81,7 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
   });
 
   if (isSlackSelected) {
+    let italizedDescription = getItalizedString(slackData.description);
     await slackApi("chat.postMessage", authToken, {
       channel: winsChannelId,
       blocks: [
@@ -87,7 +89,7 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*:tada: _${slackData.title}!_ :tada:* - <@${payload.user.id}>'s latest hype!\n_${slackData.description}_`,
+            text: `*New hype: ${slackData.title}* :tada:\n${italizedDescription}\n-<@${payload.user.id}>`,
           },
         },
       ],
@@ -122,6 +124,7 @@ const addGoalAction = async (payload, authToken, winsChannelId) => {
     return shared.value === "slack";
   });
   if (isSlackSelected) {
+    let italizedDescription = getItalizedString(slackData.description);
     await slackApi("chat.postMessage", authToken, {
       channel: winsChannelId,
       blocks: [
@@ -129,7 +132,7 @@ const addGoalAction = async (payload, authToken, winsChannelId) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*:tada: _${slackData.title}!_ :tada:* - <@${payload.user.id}>'s newest goal!\n_${slackData.description}_`,
+            text: `*New goal: ${slackData.title}* :tada:\n${italizedDescription}\n-<@${payload.user.id}>`,
           },
         },
       ],
