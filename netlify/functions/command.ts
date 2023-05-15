@@ -104,7 +104,7 @@ export const handler: Handler = async (event) => {
 const userNotFoundCommand = async (body, email, authToken) => {
   const { trigger_id } = body;
 
-  let createAnAccountText = `You can create an account easily through the web.`;
+  let createAnAccountText = `Create an account - use *SLACKHYPE* for 20% off`;
 
   // TODO(aashni): check if slack is part of our business accounts / have a partnership code / something here
   if (false) {
@@ -122,18 +122,10 @@ const userNotFoundCommand = async (body, email, authToken) => {
       callback_id: "user-not-found",
       blocks: [
         {
-          type: "header",
-          text: {
-            type: "plain_text",
-            text: "Your HypeDocs Account Can't Be Found",
-            emoji: true,
-          },
-        },
-        {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `We couldn't find a HypeDocs account associated with your email ${email}.`,
+            text: `We couldn't find a HypeDocs account associated with your email _${email}_.`,
           },
         },
         {
@@ -158,18 +150,7 @@ const userNotFoundCommand = async (body, email, authToken) => {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "If this sounds like a mistake, get in touch with us and we'll help you!",
-          },
-          accessory: {
-            type: "button",
-            text: {
-              type: "plain_text",
-              text: "Email Us",
-              emoji: true,
-            },
-            value: "contact_us",
-            url: "mailto:contact@hypedocs.co",
-            action_id: "button-action",
+            text: "If this sounds like a mistake, get in touch with us at contact@hypedocs.co!",
           },
         },
       ],
