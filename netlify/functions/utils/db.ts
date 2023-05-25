@@ -68,6 +68,54 @@ export const getSlackUsers = async (slackId) => {
     .then(format);
 };
 
+export const getSlackUsersByUId = async (userId) => {
+  return firestore
+    .collection("slackUsers")
+    .where("user_id", "==", userId)
+    .get()
+    .then(format);
+};
+
+export const getSlackListBySlackIds = async (slackList) => {
+  try {
+    console.log(`inside getSlackListBySlackIds`);
+    const slackItems: any[] = [];
+    const maxInQuerySize = 10; // Maximum number of values per "in" query
+
+    let slackIds = slackList.map((slack) => slack.slack_id);
+
+    // Split the Slack IDs into chunks based on the maximum query size
+    const chunks: string[][] = [];
+    for (let i = 0; i < slackIds.length; i += maxInQuerySize) {
+      const chunk = slackIds.slice(i, i + maxInQuerySize);
+      chunks.push(chunk);
+    }
+
+    // console.log(`chunks: ${JSON.stringify(chunks)}`);
+
+    // Perform separate queries for each chunk of Slack IDs
+    const queryPromises: Promise<any>[] = chunks.map((chunk) => {
+      return firestore.collection("slack").where("id", "in", chunk).get();
+    });
+
+    const querySnapshots = await Promise.all(queryPromises);
+
+    // Process the query snapshots and add matching documents to slackItems array
+    querySnapshots.forEach((snapshot) => {
+      snapshot.forEach((doc) => {
+        slackItems.push(doc.data());
+      });
+    });
+
+    // console.log(`slackItems: ${JSON.stringify(slackItems)}`);
+
+    return slackItems;
+  } catch (error) {
+    console.error("Error getting Slack items:", error);
+    return [];
+  }
+};
+
 const randomHypeQuery = async (randomId, comparator, userId) => {
   return firestore
     .collection("hypeEvents")

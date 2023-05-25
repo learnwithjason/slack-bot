@@ -1,4 +1,9 @@
-import { getUserGoals, getUserByEmail } from "./db";
+import {
+  getUserGoals,
+  getUserByEmail,
+  getSlackUsersByUId,
+  getSlackListBySlackIds,
+} from "./db";
 import { goalStates, SLACK_ACTIONS } from "./enums";
 import { slackApi } from "./slack";
 
@@ -128,6 +133,43 @@ export const getUserGoalOptionsFromFirebase = async (user_id) => {
   }
 
   return goalOptions;
+};
+
+export const getSlackOptionsFromFirebase = async (userId) => {
+  let slackOptions: object[] = [];
+
+  const slackOptionsFromFirebase = await getSlackUsersByUId(userId);
+
+  // console.log(
+  //   `slackOptionsFromFirebase: ${JSON.stringify(slackOptionsFromFirebase)}`
+  // );
+
+  if (slackOptionsFromFirebase.length === 0) {
+    slackOptions.push({
+      text: {
+        type: "plain_text",
+        text: "No other sources - add one in Settings",
+      },
+      value: "NO_ALT_INTEGRATIONS",
+    });
+  } else {
+    let slackList = await getSlackListBySlackIds(slackOptionsFromFirebase);
+    console.log(`\n\nslackList: ${JSON.stringify(slackList)}`);
+
+    slackList.forEach((option) => {
+      slackOptions.push({
+        text: {
+          type: "plain_text",
+          text: `#${option.wins_channel_name} in ${option.team_name}`,
+        },
+        value: `${option.id}`,
+      });
+    });
+  }
+
+  console.log(`\n\slackPptions: ${JSON.stringify(slackOptions)}`);
+
+  return slackOptions;
 };
 
 export const formatHypesForSlackMessage = async (hypes) => {
