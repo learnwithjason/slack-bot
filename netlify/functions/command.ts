@@ -329,24 +329,7 @@ const addHypeCommand = async (
   const { trigger_id } = body;
 
   const goalOptions = await getUserGoalOptionsFromFirebase(hypeUser[0].uid);
-
-  const slackUserAccounts = await getSlackUsersByUId(hypeUser[0].uid);
-  // console.log(`userid:${hypeUser[0].uid}`);
-  // console.log(`slackUserAccount: ${JSON.stringify(slackUserAccounts)}`);
-  // const slackOptionsFromFirebase = await getUserSlackFromUserSlackId(
-  //   "U9A18B2M9"
-  // );
-  // console.log(`testing: ${JSON.stringify(slackOptionsFromFirebase)}`);
-
-  console.log(
-    `userSlackId: ${hypeUser[0].uid}, hypeUser[0] general: ${JSON.stringify(
-      hypeUser[0]
-    )}`
-  );
   let slackList: SlackOption[] = await getSlackListFromUserId(hypeUser[0].uid);
-
-  console.log(`>>> slackList: ${JSON.stringify(slackList)}`);
-
   let slackOptions: object[] = [];
 
   if (slackList === undefined || slackList.length === 0) {

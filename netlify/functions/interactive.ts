@@ -23,6 +23,18 @@ export const handler: Handler = async (event) => {
   }
   const payload = JSON.parse(body.payload as string);
 
+  // Check if the payload indicates a modal initialization request
+  console.log(
+    `payload.type: ${payload.type} |||| payload: ${JSON.stringify(payload)}`
+  );
+  if (payload.type === "block_actions") {
+    // Skip processing the payload as it's a modal initialization
+    console.log(`view submission, modal invocation`);
+    return { statusCode: 200, body: "ok" };
+  } else {
+    console.log(`actual invocation`);
+  }
+
   // get slack token
   const slackResp = await getSlackAccount(payload.team.id);
   if (slackResp.length !== 1) {
@@ -58,6 +70,13 @@ export const handler: Handler = async (event) => {
 
 const addHypeAction = async (payload, authToken, winsChannelId) => {
   const values = payload.view.state.values;
+  if (
+    values.title_block.title.value === "" ||
+    values.title_block.title.value === undefined
+  ) {
+    console.log(`no title, so false invocation`);
+    return;
+  }
 
   // hack to support when a user has no goals
   let goal = getGoalValueFromBlock(values.goal_block.goal);
@@ -71,6 +90,8 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
     sharing: values.sharing_block.sharing.selected_options,
     share_multiple: values.share_multiple_block.share_multiple.selected_options,
   };
+
+  console.log(`>> slackData in interctive: ${JSON.stringify(slackData)}`);
 
   let firebaseUser = await getFirebaseUserFromSlackUser(
     payload.user.id,

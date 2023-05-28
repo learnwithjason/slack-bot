@@ -190,11 +190,9 @@ export const shareHypeToOtherSlackChannels = async (
   console.log(
     `> inside shareHypeToOtherSlackChannels, slackId: ${slackId}, winsChannelId: ${winsChannelId}`
   );
-  console.log(`> slackData: ${JSON.stringify(slackData)}`);
 
   // get auth token from slackId
   let slackFromDb = await getSlackFromSlackId(slackId);
-  console.log(`> slackFromDb: ${JSON.stringify(slackFromDb)}`);
 
   if (slackFromDb.length > 0) {
     let italizedDescription = getItalizedString(slackData.description);
