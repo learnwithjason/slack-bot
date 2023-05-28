@@ -3,5 +3,9 @@ export const getRandomNumber = (upperCount) => {
 };
 
 export const getItalizedString = (string) => {
-  return "_" + string.split("\n").join("_\n_") + "_";
+  if (!!string) {
+    return "_" + string.split("\n").join("_\n_") + "_";
+  } else {
+    return "";
+  }
 };

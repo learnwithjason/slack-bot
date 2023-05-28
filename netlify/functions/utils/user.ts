@@ -4,9 +4,11 @@ import {
   getSlackUsersByUId,
   getSlackListBySlackIds,
   getUserSlackFromUserSlackId,
+  getSlackFromSlackId,
 } from "./db";
 import { goalStates, SLACK_ACTIONS } from "./enums";
 import { slackApi } from "./slack";
+import { getItalizedString } from "./utils";
 
 export const getActionFromText = (text) => {
   let action = "";
@@ -177,6 +179,49 @@ export const getSlackOptionsFromFirebase = async (userSlackId) => {
   console.log(`\n\slackPptions: ${JSON.stringify(slackOptions)}`);
 
   return slackOptions;
+};
+
+export const shareHypeToOtherSlackChannels = async (
+  slackId,
+  slackData,
+  winsChannelId,
+  payloadUserId
+) => {
+  console.log(
+    `> inside shareHypeToOtherSlackChannels, slackId: ${slackId}, winsChannelId: ${winsChannelId}`
+  );
+  console.log(`> slackData: ${JSON.stringify(slackData)}`);
+
+  // get auth token from slackId
+  let slackFromDb = await getSlackFromSlackId(slackId);
+  console.log(`> slackFromDb: ${JSON.stringify(slackFromDb)}`);
+
+  if (slackFromDb.length > 0) {
+    console.log(`> we have slacks, so sharing`);
+    console.log(`> slackFromDb[0]: ${JSON.stringify(slackFromDb[0])}`);
+    // send slack message
+    // try {
+    //   let italizedDescription = getItalizedString(slackData.description);
+    // } catch (error) {
+    //   console.log(`error: ${error}`);
+    //   let italizedDescription = "hi";
+    // }
+    let italizedDescription = getItalizedString(slackData.description);
+
+    await slackApi("chat.postMessage", slackFromDb[0].authToken, {
+      channel: winsChannelId,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `:tada: *New hype:* ${slackData.title}\n${italizedDescription}\n-<@${payloadUserId}>`,
+          },
+        },
+      ],
+    });
+    console.log(`completed the share`);
+  }
 };
 
 export const formatHypesForSlackMessage = async (hypes) => {

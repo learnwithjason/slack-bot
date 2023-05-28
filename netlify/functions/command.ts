@@ -370,8 +370,6 @@ const addHypeCommand = async (
       });
   }
 
-  console.log(`\n\slackOptions: ${JSON.stringify(slackOptions)}`);
-
   const res = await slackApi("views.open", authToken, {
     trigger_id,
     view: {

@@ -8,6 +8,7 @@ import { slackApi } from "./utils/slack";
 import {
   getActionFromCallback,
   getFirebaseUserFromSlackUser,
+  shareHypeToOtherSlackChannels,
 } from "./utils/user";
 import { getItalizedString } from "./utils/utils";
 
@@ -77,28 +78,46 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
   );
   let newHypeCreated = await createNewHype(firebaseUser[0], slackData);
 
-  console.log(`share_multiple: ${JSON.stringify(slackData.share_multiple)}`);
-
-  const isSlackSelected = slackData.sharing.find((shared) => {
-    return shared.value === "slack";
-  });
-
-  if (isSlackSelected) {
-    let italizedDescription = getItalizedString(slackData.description);
-    await slackApi("chat.postMessage", authToken, {
-      channel: winsChannelId,
-      blocks: [
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `:tada: *New hype:* ${slackData.title}\n${italizedDescription}\n-<@${payload.user.id}>`,
-          },
-        },
-      ],
-    });
+  console.log(`> share_multiple: ${JSON.stringify(slackData.share_multiple)}`);
+  // get list of selected slack accounts
+  // then craft and output a message accordingly
+  // check for rate limiting stuff
+  if (slackData.share_multiple.length > 0) {
+    for (const slack of slackData.share_multiple) {
+      console.log(`> slack: ${JSON.stringify(slack)}`);
+      await shareHypeToOtherSlackChannels(
+        slack.value,
+        slackData,
+        winsChannelId,
+        payload.user.id
+      );
+      console.log(`returned from shareHypeToOtherSlackChannels`);
+    }
   }
 
+  console.log(`outside if block`);
+
+  // const isSlackSelected = slackData.sharing.find((shared) => {
+  //   return shared.value === "slack";
+  // });
+
+  // if (isSlackSelected) {
+  //   let italizedDescription = getItalizedString(slackData.description);
+  //   await slackApi("chat.postMessage", authToken, {
+  //     channel: winsChannelId,
+  //     blocks: [
+  //       {
+  //         type: "section",
+  //         text: {
+  //           type: "mrkdwn",
+  //           text: `:tada: *New hype:* ${slackData.title}\n${italizedDescription}\n-<@${payload.user.id}>`,
+  //         },
+  //       },
+  //     ],
+  //   });
+  // }
+
+  console.log(`about to run acknowledge action`);
   acknowledgeAction(
     payload.user.id,
     payload.user.id,

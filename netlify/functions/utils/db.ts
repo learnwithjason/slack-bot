@@ -191,10 +191,8 @@ export async function getSlackListFromUserId(
       // array to store the slackIds
       const slackIds: any[] = [];
       userSlacksSnapshot.forEach((doc) => {
-        console.log(`doc: ${JSON.stringify(doc.data)}`);
         slackIds.push(doc.get("slack_id"));
       });
-      console.log(`slackIds: ${JSON.stringify(slackIds)}`);
 
       // Process slackIds in batches to avoid limit issues
       const batchSize = 10; // Define the batch size
@@ -215,7 +213,6 @@ export async function getSlackListFromUserId(
             slackSnapshot.forEach((slackDoc) => {
               // Access the matching entry data
               const slackData = slackDoc.data();
-              console.log("Matching entry:", slackData);
               slackList.push({
                 wins_channel_name: slackData.wins_channel_name,
                 team_name: slackData.team_name,
@@ -228,9 +225,6 @@ export async function getSlackListFromUserId(
       // Execute all promises concurrently
       return Promise.all(promises)
         .then((data) => {
-          console.log(
-            `All batches processed successfully: ${JSON.stringify(data)}`
-          );
           return slackList; // Return slackList as the final result
         })
         .catch((error) => {
@@ -310,6 +304,14 @@ const randomGoalQuery = async (randomId, comparator, userId) => {
     .where("currentGoalStatus", "==", "ACTIVE_GOAL")
     .where(firebaseAdmin.firestore.FieldPath.documentId(), comparator, randomId)
     .limit(1)
+    .get()
+    .then(format);
+};
+
+export const getSlackFromSlackId = async (slackId) => {
+  return firestore
+    .collection("slack")
+    .where("id", "==", slackId)
     .get()
     .then(format);
 };
