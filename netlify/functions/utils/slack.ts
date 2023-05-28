@@ -2,6 +2,8 @@ import type { RequestInit } from "node-fetch";
 import fetch from "node-fetch";
 
 export function slackApi(endpoint: string, authToken, body?: object) {
+  console.log(`>>>>>>>>>>>>> authToken: ${authToken}`);
+  console.log(`>>>>>>>>>>>>> body: ${JSON.stringify(body)}`);
   const options: RequestInit = {
     method: "GET",
     headers: {

@@ -97,25 +97,25 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
 
   console.log(`outside if block`);
 
-  // const isSlackSelected = slackData.sharing.find((shared) => {
-  //   return shared.value === "slack";
-  // });
+  const isSlackSelected = slackData.sharing.find((shared) => {
+    return shared.value === "slack";
+  });
 
-  // if (isSlackSelected) {
-  //   let italizedDescription = getItalizedString(slackData.description);
-  //   await slackApi("chat.postMessage", authToken, {
-  //     channel: winsChannelId,
-  //     blocks: [
-  //       {
-  //         type: "section",
-  //         text: {
-  //           type: "mrkdwn",
-  //           text: `:tada: *New hype:* ${slackData.title}\n${italizedDescription}\n-<@${payload.user.id}>`,
-  //         },
-  //       },
-  //     ],
-  //   });
-  // }
+  if (isSlackSelected) {
+    let italizedDescription = getItalizedString(slackData.description);
+    await slackApi("chat.postMessage", authToken, {
+      channel: winsChannelId,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `:tada: *New hype:* ${slackData.title}\n${italizedDescription}\n-<@${payload.user.id}>`,
+          },
+        },
+      ],
+    });
+  }
 
   console.log(`about to run acknowledge action`);
   acknowledgeAction(

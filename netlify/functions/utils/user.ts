@@ -208,8 +208,8 @@ export const shareHypeToOtherSlackChannels = async (
     // }
     let italizedDescription = getItalizedString(slackData.description);
 
-    await slackApi("chat.postMessage", slackFromDb[0].authToken, {
-      channel: winsChannelId,
+    await slackApi("chat.postMessage", slackFromDb[0].access_token, {
+      channel: slackFromDb[0].wins_channel_id,
       blocks: [
         {
           type: "section",
