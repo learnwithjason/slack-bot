@@ -8,6 +8,10 @@ import {
   getUserHypes,
   getUserGoals,
   getSlackAccount,
+  getSlackUsersByUId,
+  getUserSlackFromUserSlackId,
+  getSlackListFromUserSlackId,
+  getSlackListFromUserId,
 } from "./utils/db";
 import { getCategoriesForSlack, SLACK_ACTIONS } from "./utils/enums";
 import { slackApi } from "./utils/slack";
@@ -15,10 +19,11 @@ import {
   formatGoalsForSlackMessage,
   formatHypesForSlackMessage,
   getActionFromText,
-  getSlackOptionsFromFirebase,
   getUserEmailFromSlack,
   getUserGoalOptionsFromFirebase,
 } from "./utils/user";
+import { getSlackOptionsFromFirebase } from "./options-load-endpoint";
+import { SlackOption } from "./utils/interfaces";
 
 export const handler: Handler = async (event) => {
   if (!event.body) {
@@ -325,7 +330,47 @@ const addHypeCommand = async (
 
   const goalOptions = await getUserGoalOptionsFromFirebase(hypeUser[0].uid);
 
-  // const shareOptions = await getSlackOptionsFromFirebase(hypeUser[0].uid);
+  const slackUserAccounts = await getSlackUsersByUId(hypeUser[0].uid);
+  // console.log(`userid:${hypeUser[0].uid}`);
+  // console.log(`slackUserAccount: ${JSON.stringify(slackUserAccounts)}`);
+  // const slackOptionsFromFirebase = await getUserSlackFromUserSlackId(
+  //   "U9A18B2M9"
+  // );
+  // console.log(`testing: ${JSON.stringify(slackOptionsFromFirebase)}`);
+
+  console.log(
+    `userSlackId: ${hypeUser[0].uid}, hypeUser[0] general: ${JSON.stringify(
+      hypeUser[0]
+    )}`
+  );
+  let slackList: SlackOption[] = await getSlackListFromUserId(hypeUser[0].uid);
+
+  console.log(`>>> slackList: ${JSON.stringify(slackList)}`);
+
+  let slackOptions: object[] = [];
+
+  if (slackList === undefined || slackList.length === 0) {
+    slackOptions.push({
+      text: {
+        type: "plain_text",
+        text: "No other sources - add one in Settings",
+      },
+      value: "NO_ALT_INTEGRATIONS",
+    });
+  } else {
+    !!slackList &&
+      slackList.forEach((option) => {
+        slackOptions.push({
+          text: {
+            type: "plain_text",
+            text: `#${option.wins_channel_name} in ${option.team_name}`,
+          },
+          value: `${option.id}`,
+        });
+      });
+  }
+
+  console.log(`\n\slackOptions: ${JSON.stringify(slackOptions)}`);
 
   const res = await slackApi("views.open", authToken, {
     trigger_id,
@@ -489,20 +534,22 @@ const addHypeCommand = async (
 
         {
           type: "section",
-          block_id: "share_to_multiple_integrations",
+          block_id: "share_multiple_block",
           text: {
             type: "mrkdwn",
             text: "Where else would you like to celebrate your hypes?",
           },
           accessory: {
             action_id: "share_multiple",
-            type: "multi_external_select",
+            type: "multi_static_select",
             // initial_options:
             //   '[{"text":{"type":"plain_text","text":"Maru"},"value":"maru"}]',
             placeholder: {
               type: "plain_text",
               text: "Select items",
             },
+            options: slackOptions,
+            // slackData: JSON.stringify(slackOptionsFromFirebase),
           },
         },
 

@@ -1,5 +1,6 @@
 import { firebaseAdmin } from "./firebase";
 import { v4 as uuidv4 } from "uuid";
+import { SlackOption } from "./interfaces";
 
 const firestore = firebaseAdmin.firestore();
 
@@ -67,6 +68,181 @@ export const getSlackUsers = async (slackId) => {
     .get()
     .then(format);
 };
+
+export const getUserSlackFromUserSlackId = async (userSlackId) => {
+  console.log(`inside getUserSlackFromUserSlackId userSlackId: ${userSlackId}`);
+  return firestore
+    .collection("slackUsers")
+    .where("user_slack_id", "==", userSlackId)
+    .get()
+    .then(format);
+};
+
+export async function getSlackListFromUserSlackId(
+  userSlackId: string
+): Promise<SlackOption[]> {
+  console.log(
+    `inside getSlackOptionsFromFirebase, slackUserId: ${userSlackId}`
+  );
+  let slackList: SlackOption[] = [];
+
+  return firestore
+    .collection("slackUsers")
+    .where("user_slack_id", "==", userSlackId)
+    .get()
+    .then((querySnapshot) => {
+      console.log(`inside first then`);
+      console.log(`querySnapshot: ${JSON.stringify(querySnapshot.size)}`);
+      if (querySnapshot.empty) {
+        return slackList;
+      }
+
+      // get the userId:
+      console.log(`querySnapshot.docs: ${querySnapshot.docs.toString()}`);
+      let userId = querySnapshot.docs[0].get("user_id");
+      console.log(`userId: ${userId}`);
+
+      // get related slack entries:
+      return firestore
+        .collection("slackUsers")
+        .where("user_id", "==", userId)
+        .get()
+        .then((userSlacksSnapshot) => {
+          console.log(`inside userSlacksSnapshot`);
+          if (userSlacksSnapshot.empty) {
+            return slackList;
+          }
+          console.log(`inside first snapshot`);
+
+          // array to store the slackIds
+          const slackIds: any[] = [];
+          userSlacksSnapshot.forEach((doc) => {
+            console.log(`doc: ${JSON.stringify(doc.data)}`);
+            slackIds.push(doc.get("slack_id"));
+          });
+          console.log(`slackIds: ${JSON.stringify(slackIds)}`);
+
+          // Process slackIds in batches to avoid limit issues
+          const batchSize = 10; // Define the batch size
+          const batches: any[] = [];
+          for (let i = 0; i < slackIds.length; i += batchSize) {
+            const batch = slackIds.slice(i, i + batchSize);
+            batches.push(batch);
+          }
+
+          // Process each batch of slackIds
+          const promises = batches.map((batch) => {
+            return firestore
+              .collection("slack")
+              .where("id", "in", batch)
+              .get()
+              .then((slackSnapshot) => {
+                // Process the matching entries from the "slack" table
+                slackSnapshot.forEach((slackDoc) => {
+                  // Access the matching entry data
+                  const slackData = slackDoc.data();
+                  console.log("Matching entry:", slackData);
+                  slackList.push({
+                    wins_channel_name: slackData.wins_channel_name,
+                    team_name: slackData.team_name,
+                    id: slackData.id,
+                  });
+                });
+              });
+          });
+
+          // Execute all promises concurrently
+          return Promise.all(promises)
+            .then((data) => {
+              console.log(
+                `All batches processed successfully: ${JSON.stringify(data)}`
+              );
+              return slackList; // Return slackList as the final result
+            })
+            .catch((error) => {
+              console.log("Error processing batches:", error);
+              return slackList; // Return slackList in case of error
+            });
+        });
+    })
+    .catch((error) => {
+      console.log('Error fetching user from "slackUsers" table:', error);
+      return slackList; // Return slackList in case of error
+    });
+}
+
+export async function getSlackListFromUserId(
+  userId: string
+): Promise<SlackOption[]> {
+  console.log(`inside getSlackOptionsFromFirebase, slackUserId: ${userId}`);
+  let slackList: SlackOption[] = [];
+
+  return firestore
+    .collection("slackUsers")
+    .where("user_id", "==", userId)
+    .get()
+    .then((userSlacksSnapshot) => {
+      console.log(`inside userSlacksSnapshot`);
+      if (userSlacksSnapshot.empty) {
+        return slackList;
+      }
+      console.log(`inside first snapshot`);
+
+      // array to store the slackIds
+      const slackIds: any[] = [];
+      userSlacksSnapshot.forEach((doc) => {
+        console.log(`doc: ${JSON.stringify(doc.data)}`);
+        slackIds.push(doc.get("slack_id"));
+      });
+      console.log(`slackIds: ${JSON.stringify(slackIds)}`);
+
+      // Process slackIds in batches to avoid limit issues
+      const batchSize = 10; // Define the batch size
+      const batches: any[] = [];
+      for (let i = 0; i < slackIds.length; i += batchSize) {
+        const batch = slackIds.slice(i, i + batchSize);
+        batches.push(batch);
+      }
+
+      // Process each batch of slackIds
+      const promises = batches.map((batch) => {
+        return firestore
+          .collection("slack")
+          .where("id", "in", batch)
+          .get()
+          .then((slackSnapshot) => {
+            // Process the matching entries from the "slack" table
+            slackSnapshot.forEach((slackDoc) => {
+              // Access the matching entry data
+              const slackData = slackDoc.data();
+              console.log("Matching entry:", slackData);
+              slackList.push({
+                wins_channel_name: slackData.wins_channel_name,
+                team_name: slackData.team_name,
+                id: slackData.id,
+              });
+            });
+          });
+      });
+
+      // Execute all promises concurrently
+      return Promise.all(promises)
+        .then((data) => {
+          console.log(
+            `All batches processed successfully: ${JSON.stringify(data)}`
+          );
+          return slackList; // Return slackList as the final result
+        })
+        .catch((error) => {
+          console.log("Error processing batches:", error);
+          return slackList; // Return slackList in case of error
+        });
+    })
+    .catch((error) => {
+      console.log('Error fetching user from "slackUsers" table:', error);
+      return slackList; // Return slackList in case of error
+    });
+}
 
 export const getSlackUsersByUId = async (userId) => {
   return firestore

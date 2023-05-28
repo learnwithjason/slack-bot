@@ -3,6 +3,7 @@ import {
   getUserByEmail,
   getSlackUsersByUId,
   getSlackListBySlackIds,
+  getUserSlackFromUserSlackId,
 } from "./db";
 import { goalStates, SLACK_ACTIONS } from "./enums";
 import { slackApi } from "./slack";
@@ -135,14 +136,20 @@ export const getUserGoalOptionsFromFirebase = async (user_id) => {
   return goalOptions;
 };
 
-export const getSlackOptionsFromFirebase = async (userId) => {
+export const getSlackOptionsFromFirebase = async (userSlackId) => {
+  console.log(`userSlackId: ${userSlackId}`);
   let slackOptions: object[] = [];
 
-  const slackOptionsFromFirebase = await getSlackUsersByUId(userId);
+  // const userId = await getUserSlackFromUserSlackId(userSlackId);
+  // console.log(`userId: ${userId}`);
+  // const slackOptionsFromFirebase = await getSlackUsersByUId(userId);
 
-  // console.log(
-  //   `slackOptionsFromFirebase: ${JSON.stringify(slackOptionsFromFirebase)}`
-  // );
+  let tempUserId = "i92Vh0rW1vRjQPprmpf0niIQAkJ3";
+  const slackOptionsFromFirebase = await getSlackUsersByUId(tempUserId);
+
+  console.log(
+    `slackOptionsFromFirebase: ${JSON.stringify(slackOptionsFromFirebase)}`
+  );
 
   if (slackOptionsFromFirebase.length === 0) {
     slackOptions.push({

@@ -68,6 +68,7 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
     goal: goal,
     description: values.description_block.description.value,
     sharing: values.sharing_block.sharing.selected_options,
+    share_multiple: values.share_multiple_block.share_multiple.selected_options,
   };
 
   let firebaseUser = await getFirebaseUserFromSlackUser(
@@ -75,6 +76,8 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
     authToken
   );
   let newHypeCreated = await createNewHype(firebaseUser[0], slackData);
+
+  console.log(`share_multiple: ${JSON.stringify(slackData.share_multiple)}`);
 
   const isSlackSelected = slackData.sharing.find((shared) => {
     return shared.value === "slack";
