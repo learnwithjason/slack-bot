@@ -573,30 +573,6 @@ const addGoalCommand = async (
           optional: true,
         },
         {
-          block_id: "sharing_block",
-          type: "input",
-          optional: true,
-          element: {
-            type: "checkboxes",
-            action_id: "sharing",
-            options: [
-              {
-                text: {
-                  type: "plain_text",
-                  text: `Share on ${slackName}'s Slack in #${winChannelName}`,
-                  emoji: true,
-                },
-                value: "slack",
-              },
-            ],
-          },
-          label: {
-            type: "plain_text",
-            text: "Select how you'd like to share your Hype:",
-            emoji: true,
-          },
-        },
-        {
           type: "section",
           block_id: "share_multiple_block",
           text: {
