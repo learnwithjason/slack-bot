@@ -92,7 +92,8 @@ export const handler: Handler = async (event) => {
       body,
       AUTH_TOKEN,
       SLACK_DATA.team_name,
-      WINS_CHANNEL_NAME
+      WINS_CHANNEL_NAME,
+      hypeUser
     );
   } else if (action === SLACK_ACTIONS.LIST_HYPE) {
     res = await listHypeCommand(body, hypeUser[0], AUTH_TOKEN);
@@ -328,29 +329,7 @@ const addHypeCommand = async (
   const { trigger_id } = body;
 
   const goalOptions = await getUserGoalOptionsFromFirebase(hypeUser[0].uid);
-  let slackList: SlackOption[] = await getSlackListFromUserId(hypeUser[0].uid);
-  let slackOptions: object[] = [];
-
-  if (slackList === undefined || slackList.length === 0) {
-    slackOptions.push({
-      text: {
-        type: "plain_text",
-        text: "No other sources - add one in Settings",
-      },
-      value: "NO_ALT_INTEGRATIONS",
-    });
-  } else {
-    !!slackList &&
-      slackList.forEach((option) => {
-        slackOptions.push({
-          text: {
-            type: "plain_text",
-            text: `#${option.wins_channel_name} in ${option.team_name}`,
-          },
-          value: `${option.id}_${option.user_slack_id}`,
-        });
-      });
-  }
+  let slackOptions = await getSlackOptions(hypeUser[0].uid);
 
   const res = await slackApi("views.open", authToken, {
     trigger_id,
@@ -474,10 +453,45 @@ const addHypeCommand = async (
   return res;
 };
 
-const addGoalCommand = async (body, authToken, slackName, winChannelName) => {
+const getSlackOptions = async (userId) => {
+  let slackList: SlackOption[] = await getSlackListFromUserId(userId);
+  let slackOptions: any[] = [];
+
+  if (slackList === undefined || slackList.length === 0) {
+    slackOptions.push({
+      text: {
+        type: "plain_text",
+        text: "No other sources - add one in Settings",
+      },
+      value: "NO_ALT_INTEGRATIONS",
+    });
+  } else {
+    !!slackList &&
+      slackList.forEach((option) => {
+        slackOptions.push({
+          text: {
+            type: "plain_text",
+            text: `#${option.wins_channel_name} in ${option.team_name}`,
+          },
+          value: `${option.id}_${option.user_slack_id}`,
+        });
+      });
+  }
+
+  return slackOptions;
+};
+
+const addGoalCommand = async (
+  body,
+  authToken,
+  slackName,
+  winChannelName,
+  hypeUser
+) => {
   const { trigger_id } = body;
 
   const categoryOptions = getCategoriesForSlack();
+  let slackOptions = await getSlackOptions(hypeUser[0].uid);
 
   const res = await slackApi("views.open", authToken, {
     trigger_id,
@@ -580,6 +594,23 @@ const addGoalCommand = async (body, authToken, slackName, winChannelName) => {
             type: "plain_text",
             text: "Select how you'd like to share your Hype:",
             emoji: true,
+          },
+        },
+        {
+          type: "section",
+          block_id: "share_multiple_block",
+          text: {
+            type: "mrkdwn",
+            text: "Where else would you like to celebrate your hypes?",
+          },
+          accessory: {
+            action_id: "share_multiple",
+            type: "multi_static_select",
+            placeholder: {
+              type: "plain_text",
+              text: "Select items",
+            },
+            options: slackOptions,
           },
         },
       ],

@@ -172,7 +172,6 @@ export const getSlackOptionsFromFirebase = async (userSlackId) => {
 export const shareHypeToOtherSlackChannels = async (
   slackId,
   slackData,
-  winsChannelId,
   userSlackId
 ) => {
   // get auth token from slackId
@@ -189,6 +188,32 @@ export const shareHypeToOtherSlackChannels = async (
           text: {
             type: "mrkdwn",
             text: `:tada: *New hype:* ${slackData.title}\n${italizedDescription}\n-<@${userSlackId}>`,
+          },
+        },
+      ],
+    });
+  }
+};
+
+export const shareGoalToOtherSlackChannels = async (
+  slackId,
+  slackData,
+  userSlackId
+) => {
+  // get auth token from slackId
+  let slackFromDb = await getSlackFromSlackId(slackId);
+
+  if (slackFromDb.length > 0) {
+    let italizedDescription = getItalizedString(slackData.description);
+
+    await slackApi("chat.postMessage", slackFromDb[0].access_token, {
+      channel: slackFromDb[0].wins_channel_id,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `:dart: *New goal:* ${slackData.title}\n${italizedDescription}\n-<@${userSlackId}>`,
           },
         },
       ],

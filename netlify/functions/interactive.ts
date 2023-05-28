@@ -8,6 +8,7 @@ import { slackApi } from "./utils/slack";
 import {
   getActionFromCallback,
   getFirebaseUserFromSlackUser,
+  shareGoalToOtherSlackChannels,
   shareHypeToOtherSlackChannels,
 } from "./utils/user";
 import { getItalizedString } from "./utils/utils";
@@ -91,12 +92,7 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
       let slackValueSplit = slack.value.split("_");
       let slackId = slackValueSplit[0];
       let userSlackId = slackValueSplit[1];
-      await shareHypeToOtherSlackChannels(
-        slackId,
-        slackData,
-        winsChannelId,
-        userSlackId
-      );
+      await shareHypeToOtherSlackChannels(slackId, slackData, userSlackId);
     }
   }
 
@@ -117,30 +113,27 @@ const addGoalAction = async (payload, authToken, winsChannelId) => {
     title: values.title_block.title.value,
     description: values.description_block.description.value,
     category: values.category_block.category.selected_option.value,
-    sharing: values.sharing_block.sharing.selected_options,
+    share_multiple: values.share_multiple_block.share_multiple.selected_options,
   };
   let firebaseUser = await getFirebaseUserFromSlackUser(
     payload.user.id,
     authToken
   );
   let newGoalCreated = await createNewGoal(firebaseUser[0], slackData);
-  const isSlackSelected = slackData.sharing.find((shared) => {
-    return shared.value === "slack";
-  });
-  if (isSlackSelected) {
-    let italizedDescription = getItalizedString(slackData.description);
-    await slackApi("chat.postMessage", authToken, {
-      channel: winsChannelId,
-      blocks: [
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `:dart: *New goal:* ${slackData.title}\n${italizedDescription}\n-<@${payload.user.id}>`,
-          },
-        },
-      ],
-    });
+
+  // get list of selected slack accounts
+  // then craft and output a message accordingly
+  // check for rate limiting stuff
+  if (slackData.share_multiple.length > 0) {
+    console.log(
+      `slackData.share_multiple: ${JSON.stringify(slackData.share_multiple)}`
+    );
+    for (const slack of slackData.share_multiple) {
+      let slackValueSplit = slack.value.split("_");
+      let slackId = slackValueSplit[0];
+      let userSlackId = slackValueSplit[1];
+      await shareGoalToOtherSlackChannels(slackId, slackData, userSlackId);
+    }
   }
 
   acknowledgeAction(
