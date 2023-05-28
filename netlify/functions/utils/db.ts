@@ -175,6 +175,7 @@ export async function getSlackListFromUserId(
   userId: string
 ): Promise<SlackOption[]> {
   console.log(`inside getSlackOptionsFromFirebase, slackUserId: ${userId}`);
+  let slackUserList: any[] = [];
   let slackList: SlackOption[] = [];
 
   return firestore
@@ -191,7 +192,10 @@ export async function getSlackListFromUserId(
       // array to store the slackIds
       const slackIds: any[] = [];
       userSlacksSnapshot.forEach((doc) => {
+        console.log(`doc.: ${JSON.stringify(doc.data())}`);
         slackIds.push(doc.get("slack_id"));
+        let key = doc.get("slack_id");
+        slackUserList[key] = doc.data();
       });
 
       // Process slackIds in batches to avoid limit issues
@@ -212,11 +216,14 @@ export async function getSlackListFromUserId(
             // Process the matching entries from the "slack" table
             slackSnapshot.forEach((slackDoc) => {
               // Access the matching entry data
+              console.log(`>> batch: ${JSON.stringify(batch)}`);
               const slackData = slackDoc.data();
+              console.log(`>>slackDocData: ${JSON.stringify(slackData)}`);
               slackList.push({
                 wins_channel_name: slackData.wins_channel_name,
                 team_name: slackData.team_name,
                 id: slackData.id,
+                user_slack_id: slackUserList[slackData.id].user_slack_id,
               });
             });
           });

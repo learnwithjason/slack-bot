@@ -85,11 +85,14 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
   if (slackData.share_multiple.length > 0) {
     for (const slack of slackData.share_multiple) {
       console.log(`> slack: ${JSON.stringify(slack)}`);
+      let slackValueSplit = slack.value.split("_");
+      let slackId = slackValueSplit[0];
+      let userSlackId = slackValueSplit[1];
       await shareHypeToOtherSlackChannels(
-        slack.value,
+        slackId,
         slackData,
         winsChannelId,
-        payload.user.id
+        userSlackId
       );
       console.log(`returned from shareHypeToOtherSlackChannels`);
     }

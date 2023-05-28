@@ -185,7 +185,7 @@ export const shareHypeToOtherSlackChannels = async (
   slackId,
   slackData,
   winsChannelId,
-  payloadUserId
+  userSlackId
 ) => {
   console.log(
     `> inside shareHypeToOtherSlackChannels, slackId: ${slackId}, winsChannelId: ${winsChannelId}`
@@ -197,15 +197,6 @@ export const shareHypeToOtherSlackChannels = async (
   console.log(`> slackFromDb: ${JSON.stringify(slackFromDb)}`);
 
   if (slackFromDb.length > 0) {
-    console.log(`> we have slacks, so sharing`);
-    console.log(`> slackFromDb[0]: ${JSON.stringify(slackFromDb[0])}`);
-    // send slack message
-    // try {
-    //   let italizedDescription = getItalizedString(slackData.description);
-    // } catch (error) {
-    //   console.log(`error: ${error}`);
-    //   let italizedDescription = "hi";
-    // }
     let italizedDescription = getItalizedString(slackData.description);
 
     await slackApi("chat.postMessage", slackFromDb[0].access_token, {
@@ -215,7 +206,7 @@ export const shareHypeToOtherSlackChannels = async (
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `:tada: *New hype:* ${slackData.title}\n${italizedDescription}\n-<@${payloadUserId}>`,
+            text: `:tada: *New hype:* ${slackData.title}\n${italizedDescription}\n-<@${userSlackId}>`,
           },
         },
       ],

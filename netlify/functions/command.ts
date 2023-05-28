@@ -365,7 +365,7 @@ const addHypeCommand = async (
             type: "plain_text",
             text: `#${option.wins_channel_name} in ${option.team_name}`,
           },
-          value: `${option.id}`,
+          value: `${option.id}_${option.user_slack_id}`,
         });
       });
   }
