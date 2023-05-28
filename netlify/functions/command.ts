@@ -22,7 +22,6 @@ import {
   getUserEmailFromSlack,
   getUserGoalOptionsFromFirebase,
 } from "./utils/user";
-import { getSlackOptionsFromFirebase } from "./options-load-endpoint";
 import { SlackOption } from "./utils/interfaces";
 
 export const handler: Handler = async (event) => {
@@ -451,68 +450,6 @@ const addHypeCommand = async (
           },
           optional: true,
         },
-
-        // {
-        //   block_id: "sharing_multi_block",
-        //   type: "input",
-        //   optional: true,
-        //   label: {
-        //     type: "plain_text",
-        //     text: "Is this related to any of your goals?",
-        //   },
-        //   element: {
-        //     action_id: "goal",
-        //     type: "multi_static_select",
-        //     options: shareOptions,
-        //     placeholder: {
-        //       type: "plain_text",
-        //       text: "Select a goal",
-        //       emoji: true,
-        //     },
-        //   },
-        // },
-
-        // {
-        //   type: "section",
-        //   block_id: "section678",
-        //   label: {
-        //     type: "mrkdwn",
-        //     text: "Where else would you like to share this Hype?",
-        //   },
-        //   accessory: {
-        //     action_id: "share_hype_multi",
-        //     type: "multi_static_select",
-        //     placeholder: {
-        //       type: "plain_text",
-        //       text: "Select items",
-        //     },
-        //     // options: shareOptions,
-        //     options: [
-        //       {
-        //         text: {
-        //           type: "plain_text",
-        //           text: "*this is plain_text text*",
-        //         },
-        //         value: "value-0",
-        //       },
-        //       {
-        //         text: {
-        //           type: "plain_text",
-        //           text: "*this is plain_text text*",
-        //         },
-        //         value: "value-1",
-        //       },
-        //       {
-        //         text: {
-        //           type: "plain_text",
-        //           text: "*this is plain_text text*",
-        //         },
-        //         value: "value-2",
-        //       },
-        //     ],
-        //   },
-        // },
-
         {
           type: "section",
           block_id: "share_multiple_block",
@@ -523,39 +460,11 @@ const addHypeCommand = async (
           accessory: {
             action_id: "share_multiple",
             type: "multi_static_select",
-            // initial_options:
-            //   '[{"text":{"type":"plain_text","text":"Maru"},"value":"maru"}]',
             placeholder: {
               type: "plain_text",
               text: "Select items",
             },
             options: slackOptions,
-            // slackData: JSON.stringify(slackOptionsFromFirebase),
-          },
-        },
-
-        {
-          block_id: "sharing_block",
-          type: "input",
-          optional: true,
-          element: {
-            type: "checkboxes",
-            action_id: "sharing",
-            options: [
-              {
-                text: {
-                  type: "plain_text",
-                  text: `Share on ${slackName}'s Slack in #${winChannelName}`,
-                  emoji: true,
-                },
-                value: "slack",
-              },
-            ],
-          },
-          label: {
-            type: "plain_text",
-            text: "Select how you'd like to share your Hype:",
-            emoji: true,
           },
         },
       ],

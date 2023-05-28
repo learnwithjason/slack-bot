@@ -139,19 +139,10 @@ export const getUserGoalOptionsFromFirebase = async (user_id) => {
 };
 
 export const getSlackOptionsFromFirebase = async (userSlackId) => {
-  console.log(`userSlackId: ${userSlackId}`);
   let slackOptions: object[] = [];
-
-  // const userId = await getUserSlackFromUserSlackId(userSlackId);
-  // console.log(`userId: ${userId}`);
-  // const slackOptionsFromFirebase = await getSlackUsersByUId(userId);
 
   let tempUserId = "i92Vh0rW1vRjQPprmpf0niIQAkJ3";
   const slackOptionsFromFirebase = await getSlackUsersByUId(tempUserId);
-
-  console.log(
-    `slackOptionsFromFirebase: ${JSON.stringify(slackOptionsFromFirebase)}`
-  );
 
   if (slackOptionsFromFirebase.length === 0) {
     slackOptions.push({
@@ -163,7 +154,6 @@ export const getSlackOptionsFromFirebase = async (userSlackId) => {
     });
   } else {
     let slackList = await getSlackListBySlackIds(slackOptionsFromFirebase);
-    console.log(`\n\nslackList: ${JSON.stringify(slackList)}`);
 
     slackList.forEach((option) => {
       slackOptions.push({
@@ -176,8 +166,6 @@ export const getSlackOptionsFromFirebase = async (userSlackId) => {
     });
   }
 
-  console.log(`\n\slackPptions: ${JSON.stringify(slackOptions)}`);
-
   return slackOptions;
 };
 
@@ -187,10 +175,6 @@ export const shareHypeToOtherSlackChannels = async (
   winsChannelId,
   userSlackId
 ) => {
-  console.log(
-    `> inside shareHypeToOtherSlackChannels, slackId: ${slackId}, winsChannelId: ${winsChannelId}`
-  );
-
   // get auth token from slackId
   let slackFromDb = await getSlackFromSlackId(slackId);
 
@@ -209,7 +193,6 @@ export const shareHypeToOtherSlackChannels = async (
         },
       ],
     });
-    console.log(`completed the share`);
   }
 };
 

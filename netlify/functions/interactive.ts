@@ -24,15 +24,9 @@ export const handler: Handler = async (event) => {
   const payload = JSON.parse(body.payload as string);
 
   // Check if the payload indicates a modal initialization request
-  console.log(
-    `payload.type: ${payload.type} |||| payload: ${JSON.stringify(payload)}`
-  );
   if (payload.type === "block_actions") {
     // Skip processing the payload as it's a modal initialization
-    console.log(`view submission, modal invocation`);
     return { statusCode: 200, body: "ok" };
-  } else {
-    console.log(`actual invocation`);
   }
 
   // get slack token
@@ -70,13 +64,6 @@ export const handler: Handler = async (event) => {
 
 const addHypeAction = async (payload, authToken, winsChannelId) => {
   const values = payload.view.state.values;
-  if (
-    values.title_block.title.value === "" ||
-    values.title_block.title.value === undefined
-  ) {
-    console.log(`no title, so false invocation`);
-    return;
-  }
 
   // hack to support when a user has no goals
   let goal = getGoalValueFromBlock(values.goal_block.goal);
@@ -87,11 +74,8 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
     date: values.date_block.date.selected_date,
     goal: goal,
     description: values.description_block.description.value,
-    sharing: values.sharing_block.sharing.selected_options,
     share_multiple: values.share_multiple_block.share_multiple.selected_options,
   };
-
-  console.log(`>> slackData in interctive: ${JSON.stringify(slackData)}`);
 
   let firebaseUser = await getFirebaseUserFromSlackUser(
     payload.user.id,
@@ -99,13 +83,11 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
   );
   let newHypeCreated = await createNewHype(firebaseUser[0], slackData);
 
-  console.log(`> share_multiple: ${JSON.stringify(slackData.share_multiple)}`);
   // get list of selected slack accounts
   // then craft and output a message accordingly
   // check for rate limiting stuff
   if (slackData.share_multiple.length > 0) {
     for (const slack of slackData.share_multiple) {
-      console.log(`> slack: ${JSON.stringify(slack)}`);
       let slackValueSplit = slack.value.split("_");
       let slackId = slackValueSplit[0];
       let userSlackId = slackValueSplit[1];
@@ -115,33 +97,9 @@ const addHypeAction = async (payload, authToken, winsChannelId) => {
         winsChannelId,
         userSlackId
       );
-      console.log(`returned from shareHypeToOtherSlackChannels`);
     }
   }
 
-  console.log(`outside if block`);
-
-  const isSlackSelected = slackData.sharing.find((shared) => {
-    return shared.value === "slack";
-  });
-
-  if (isSlackSelected) {
-    let italizedDescription = getItalizedString(slackData.description);
-    await slackApi("chat.postMessage", authToken, {
-      channel: winsChannelId,
-      blocks: [
-        {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `:tada: *New hype:* ${slackData.title}\n${italizedDescription}\n-<@${payload.user.id}>`,
-          },
-        },
-      ],
-    });
-  }
-
-  console.log(`about to run acknowledge action`);
   acknowledgeAction(
     payload.user.id,
     payload.user.id,
