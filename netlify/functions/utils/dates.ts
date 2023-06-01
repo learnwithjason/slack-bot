@@ -34,6 +34,14 @@ export const getTodaysDateAsTimestamp = () => {
   return new Date(year, month, day).getTime();
 };
 
+export const getTodaysDateAsYYYYMMDDWithDashes = () => {
+  let today = new Date();
+  let year = today.getFullYear();
+  let month = today.getMonth();
+  let day = today.getDate();
+  return `${year}-${month}-${day}`;
+};
+
 export const getTodaysDay = () => {
   return new Date().getDay();
 };

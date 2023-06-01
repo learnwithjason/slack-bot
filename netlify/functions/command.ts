@@ -22,6 +22,7 @@ import {
   getUserGoalOptionsFromFirebase,
 } from "./utils/user";
 import { SlackOption } from "./utils/interfaces";
+import { getTodaysDateAsYYYYMMDDWithDashes } from "./utils/dates";
 
 export const handler: Handler = async (event) => {
   if (!event.body) {
@@ -378,6 +379,7 @@ const addHypeCommand = async (
           type: "input",
           element: {
             type: "datepicker",
+            initial_date: getTodaysDateAsYYYYMMDDWithDashes(),
             placeholder: {
               type: "plain_text",
               text: "Select a date",
