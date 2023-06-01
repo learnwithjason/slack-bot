@@ -10,7 +10,6 @@ import {
   getSlackAccount,
   getSlackUsersByUId,
   getUserSlackFromUserSlackId,
-  getSlackListFromUserSlackId,
   getSlackListFromUserId,
 } from "./utils/db";
 import { getCategoriesForSlack, SLACK_ACTIONS } from "./utils/enums";
