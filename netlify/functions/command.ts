@@ -578,7 +578,7 @@ const addGoalCommand = async (
           block_id: "share_multiple_block",
           text: {
             type: "mrkdwn",
-            text: "Where else would you like to celebrate your hypes?",
+            text: "Where else would you like to share your goal?",
           },
           accessory: {
             action_id: "share_multiple",
