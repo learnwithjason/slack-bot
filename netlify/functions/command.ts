@@ -148,7 +148,7 @@ const userNotFoundCommand = async (body, email, authToken) => {
               emoji: true,
             },
             value: "create_an_account",
-            url: "https://hypedocs.co/auth/signup",
+            url: "https://app.hypedocs.co/auth/signup",
             action_id: "button-action",
           },
         },
@@ -349,7 +349,7 @@ const addHypeCommand = async (
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "Fill out this form to add a new Hype to your HypeDoc! Or, if you prefer, you can <https://hypedocs.co|create your request through the browser>.",
+            text: "Fill out this form to add a new Hype to your HypeDoc! Or, if you prefer, you can <https://app.hypedocs.co|create your request through the browser>.",
           },
         },
         {
@@ -512,7 +512,7 @@ const addGoalCommand = async (
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "Submit this form to add a new Goal to your HypeDoc! Or, if you prefer, you can <https://hypedocs.co|goals add your goal through the browser>.",
+            text: "Submit this form to add a new Goal to your HypeDoc! Or, if you prefer, you can <https://app.hypedocs.co|goals add your goal through the browser>.",
           },
         },
         {
