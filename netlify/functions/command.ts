@@ -148,7 +148,7 @@ const userNotFoundCommand = async (body, email, authToken) => {
               emoji: true,
             },
             value: "create_an_account",
-            url: "https://app.hypedocs.co/auth/signup",
+            url: "https://hypedocs.co/app/signup",
             action_id: "button-action",
           },
         },
