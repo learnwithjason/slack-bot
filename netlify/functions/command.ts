@@ -11,6 +11,8 @@ import {
   getSlackUsersByUId,
   getUserSlackFromUserSlackId,
   getSlackListFromUserId,
+  getSlackUserFromUidAndTeamId,
+  createSlackUser,
 } from "./utils/db";
 import { getCategoriesForSlack, SLACK_ACTIONS } from "./utils/enums";
 import { slackApi } from "./utils/slack";
@@ -22,7 +24,11 @@ import {
   getUserGoalOptionsFromFirebase,
 } from "./utils/user";
 import { SlackOption } from "./utils/interfaces";
-import { getTodaysDateAsYYYYMMDDWithDashes } from "./utils/dates";
+import {
+  getTodaysDateAsTimestamp,
+  getTodaysDateAsYYYYMMDDWithDashes,
+} from "./utils/dates";
+import { v4 as uuidv4 } from "uuid";
 
 export const handler: Handler = async (event) => {
   if (!event.body) {
@@ -33,6 +39,7 @@ export const handler: Handler = async (event) => {
   }
 
   const body = parse(event.body);
+  console.log(`body: ${JSON.stringify(body)}`);
   const { text, user_id, team_id } = body;
   if (!user_id || !team_id) {
     return { statusCode: 500, body: "Error: missing parameters" };
@@ -41,11 +48,10 @@ export const handler: Handler = async (event) => {
   // get slack token
   const slackResp = await getSlackAccount(team_id);
   if (slackResp.length !== 1) {
-    // TODO(aashni): change this to a generic error message instead
-    await userNotFoundCommand(body, "email", "authToken");
+    await slackNotConfiguredCommand(body, "email", "authToken");
     return {
       statusCode: 200,
-      body: "Slack Authentication failed",
+      body: "Error with Slack Configuration",
     };
   }
 
@@ -58,6 +64,9 @@ export const handler: Handler = async (event) => {
   const email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
   const hypeUser = await getUserByEmail(email);
 
+  console.log(
+    `before if, email: ${email}, hypeUser: ${JSON.stringify(hypeUser)}`
+  );
   if (hypeUser.length < 1) {
     await userNotFoundCommand(body, email, AUTH_TOKEN);
 
@@ -65,6 +74,9 @@ export const handler: Handler = async (event) => {
       statusCode: 200,
       body: "User Not Found",
     };
+  } else {
+    console.log(`inside else`);
+    checkUserInSlackUserElseCreate(hypeUser[0], body, slackResp[0]);
   }
 
   let action = getActionFromText(text);
@@ -104,6 +116,55 @@ export const handler: Handler = async (event) => {
   }
 
   return returnRes(res);
+};
+
+// check if user has a slackUser pairing, otherwise create one
+let checkUserInSlackUserElseCreate = async (
+  hypeUser,
+  dataFromSlack,
+  slackDataFromDb
+) => {
+  console.log(`inside checkUserInSlackUserElseCreate`);
+  // logic:
+  //    if user/teamId in slackUser, return
+  //    else:
+  //      get missing info
+  //      create slack user
+
+  const slackUser = await getSlackUserFromUidAndTeamId(
+    hypeUser.uid,
+    dataFromSlack.team_id
+  );
+  console.log(`slackUser: ${JSON.stringify(slackUser)}`);
+  console.log(`slackDataFromDb: ${JSON.stringify(slackDataFromDb)}`);
+
+  if (slackUser.length > 0) {
+    console.log(`returning as user has slackUser account`);
+    return;
+  }
+
+  console.log(`slackUser doesn't exist, creating it now`);
+
+  let slackUserData = {
+    id: uuidv4(),
+    user_id: hypeUser.uid,
+    user_slack_id: dataFromSlack.user_id || "", // this is the users id in slack
+    slack_id: dataFromSlack.id || "", // this is the `id` for slack in the DB
+    team_id: dataFromSlack.team_id || "",
+    team_name: slackDataFromDb.team_name || "", // userSlackAccess.team.name || "",
+    slack_username: dataFromSlack.user_name || "", // dataFromSlack.user.name || "",
+    active_slack_account: true, // dataFromSlack.user.deleted ? false : true,
+    name: hypeUser.name || "", // dataFromSlack.user_name || "",
+    email: hypeUser.email || "", // dataFromSlack.user.profile.email || "",
+    // TODO(aashni): come back and get this information for each user
+    image: "",
+    first_name: "",
+    last_name: "",
+    date_created: getTodaysDateAsTimestamp(),
+  };
+
+  console.log(`\n\n>> slackUserData: ${JSON.stringify(slackUserData)}`);
+  await createSlackUser(slackUserData);
 };
 
 // HELPER FUNCTIONS
@@ -149,6 +210,58 @@ const userNotFoundCommand = async (body, email, authToken) => {
             },
             value: "create_an_account",
             url: "https://hypedocs.co/app/signup",
+            action_id: "button-action",
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "If this sounds like a mistake, get in touch with us at contact@hypedocs.co!",
+          },
+        },
+      ],
+    },
+  });
+
+  return res;
+};
+
+const slackNotConfiguredCommand = async (body, email, authToken) => {
+  const { trigger_id } = body;
+
+  const res = await slackApi("views.open", authToken, {
+    trigger_id,
+    view: {
+      type: "modal",
+      title: {
+        type: "plain_text",
+        text: "HypeDocs Slack Bot Not Setup",
+      },
+      callback_id: "slack-not-configured",
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `Uh oh! It looks like the HypeDocs bot hasn't been configured properly.`,
+          },
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "Add HypeDocs to this Slack Workspace now",
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Setup Slack",
+              emoji: true,
+            },
+            value: "create_an_account",
+            url: "https://hypedocs.co/app/settings?i=s",
             action_id: "button-action",
           },
         },

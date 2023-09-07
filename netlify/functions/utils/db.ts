@@ -61,10 +61,24 @@ export const getSlackAccounts = async () => {
   return firestore.collection("slack").get().then(format);
 };
 
+export const createSlackUser = async (data) => {
+  return firestore.collection("slackUsers").add(data);
+};
+
 export const getSlackUsers = async (slackId) => {
   return firestore
     .collection("slackUsers")
     .where("slack_id", "==", slackId)
+    .get()
+    .then(format);
+};
+
+export const getSlackUserFromUidAndTeamId = async (userId, teamId) => {
+  console.log(`inside getSlackUser, userId: ${userId}, teamId: ${teamId}`);
+  return firestore
+    .collection("slackUsers")
+    .where("user_id", "==", userId)
+    .where("team_id", "==", teamId)
     .get()
     .then(format);
 };
