@@ -149,7 +149,7 @@ let checkUserInSlackUserElseCreate = async (
     id: uuidv4(),
     user_id: hypeUser.uid,
     user_slack_id: dataFromSlack.user_id || "", // this is the users id in slack
-    slack_id: dataFromSlack.id || "", // this is the `id` for slack in the DB
+    slack_id: slackDataFromDb.id || "", // this is the `id` for slack in the DB
     team_id: dataFromSlack.team_id || "",
     team_name: slackDataFromDb.team_name || "", // userSlackAccess.team.name || "",
     slack_username: dataFromSlack.user_name || "", // dataFromSlack.user.name || "",
