@@ -74,7 +74,6 @@ export const getSlackUsers = async (slackId) => {
 };
 
 export const getSlackUserFromUidAndTeamId = async (userId, teamId) => {
-  console.log(`inside getSlackUser, userId: ${userId}, teamId: ${teamId}`);
   return firestore
     .collection("slackUsers")
     .where("user_id", "==", userId)
