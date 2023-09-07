@@ -39,7 +39,6 @@ export const handler: Handler = async (event) => {
   }
 
   const body = parse(event.body);
-  console.log(`body: ${JSON.stringify(body)}`);
   const { text, user_id, team_id } = body;
   if (!user_id || !team_id) {
     return { statusCode: 500, body: "Error: missing parameters" };
@@ -64,9 +63,6 @@ export const handler: Handler = async (event) => {
   const email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
   const hypeUser = await getUserByEmail(email);
 
-  console.log(
-    `before if, email: ${email}, hypeUser: ${JSON.stringify(hypeUser)}`
-  );
   if (hypeUser.length < 1) {
     await userNotFoundCommand(body, email, AUTH_TOKEN);
 
@@ -75,7 +71,6 @@ export const handler: Handler = async (event) => {
       body: "User Not Found",
     };
   } else {
-    console.log(`inside else`);
     checkUserInSlackUserElseCreate(hypeUser[0], body, slackResp[0]);
   }
 
@@ -124,7 +119,6 @@ let checkUserInSlackUserElseCreate = async (
   dataFromSlack,
   slackDataFromDb
 ) => {
-  console.log(`inside checkUserInSlackUserElseCreate`);
   // logic:
   //    if user/teamId in slackUser, return
   //    else:
@@ -135,15 +129,10 @@ let checkUserInSlackUserElseCreate = async (
     hypeUser.uid,
     dataFromSlack.team_id
   );
-  console.log(`slackUser: ${JSON.stringify(slackUser)}`);
-  console.log(`slackDataFromDb: ${JSON.stringify(slackDataFromDb)}`);
 
   if (slackUser.length > 0) {
-    console.log(`returning as user has slackUser account`);
     return;
   }
-
-  console.log(`slackUser doesn't exist, creating it now`);
 
   let slackUserData = {
     id: uuidv4(),
@@ -163,7 +152,6 @@ let checkUserInSlackUserElseCreate = async (
     date_created: getTodaysDateAsTimestamp(),
   };
 
-  console.log(`\n\n>> slackUserData: ${JSON.stringify(slackUserData)}`);
   await createSlackUser(slackUserData);
 };
 
