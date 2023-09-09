@@ -450,7 +450,7 @@ const addHypeCommand = async (
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "Fill out this form to add a new Hype to your HypeDoc! Or, if you prefer, you can <https://app.hypedocs.co|create your request through the browser>.",
+            text: "Fill out this form to add a new Hype to your HypeDoc! Or, if you prefer, you can <https://hypedocs.co/app/home|create your request through the browser>.",
           },
         },
         {
@@ -613,7 +613,7 @@ const addGoalCommand = async (
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "Submit this form to add a new Goal to your HypeDoc! Or, if you prefer, you can <https://app.hypedocs.co|goals add your goal through the browser>.",
+            text: "Submit this form to add a new Goal to your HypeDoc! Or, if you prefer, you can <https://hypedocs.co/app/home|goals add your goal through the browser>.",
           },
         },
         {

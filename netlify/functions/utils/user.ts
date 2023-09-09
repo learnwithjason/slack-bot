@@ -225,17 +225,14 @@ export const formatHypesForSlackMessage = async (hypes) => {
   let listHypeMessage = "*:tada::tada: Let's celebrate _you_ :tada::tada:*\n\n";
   if (!hypes || hypes.length == 0) {
     // no hypes, return prompt message:
-    listHypeMessage = `You haven't added any hypes yet. But we know you're awesome, so add some now by typing \`/hype add hype\` or through the <https://app.hypedocs.co/home|hypedocs.co website> :tada::tada:`;
+    listHypeMessage = `You haven't added any hypes yet. But we know you're awesome, so add some now by typing \`/hype add hype\` or through the <https://hypedocs.co/app/home|hypedocs.co website> :tada::tada:`;
     return listHypeMessage;
   }
 
-  let messageList = hypes.map(
-    (hype, key) =>
-      `*${hype.title}* - <https://app.hypedocs.co/hype/${hype.id}|see more>`
-  );
+  let messageList = hypes.map((hype, key) => `*${hype.title}*`);
   listHypeMessage = listHypeMessage + "\n\n" + messageList.join("\n");
 
-  listHypeMessage = `${listHypeMessage}\n\n\n\n:tada::tada: Aren't you awesome! :tada::tada:\n\nAdd more hypes by typing \`/hype add hype\` or add new goals by using \`/hype add goal\`.\nYou can also log on at <https://app.hypedocs.co/home|hypedocs.co>.`;
+  listHypeMessage = `${listHypeMessage}\n\n\n\n:tada::tada: Aren't you awesome! :tada::tada:\n\nAdd more hypes by typing \`/hype add hype\` or add new goals by using \`/hype add goal\`.\nYou can also log on at <https://hypedocs.co/app/home|hypedocs.co>.`;
 
   return listHypeMessage;
 };
@@ -245,7 +242,7 @@ export const formatGoalsForSlackMessage = async (goals) => {
     "*:tada::tada: What Are You Working Towards? :tada::tada:*\n\n";
   if (!goals || goals.length == 0) {
     // no hypes, return prompt message:
-    listGoalMessage = `You haven't added any goals yet. Add some now by typing \`/hype add goal\` or through the <https://app.hypedocs.co/home|hypedocs.co website> :tada::tada:`;
+    listGoalMessage = `You haven't added any goals yet. Add some now by typing \`/hype add goal\` or through the <https://hypedocs.co/app/home|hypedocs.co website> :tada::tada:`;
     return listGoalMessage;
   }
 
@@ -255,13 +252,11 @@ export const formatGoalsForSlackMessage = async (goals) => {
         goal.status === goalStates.COMPLETE
           ? `:large_green_circle:`
           : `:large_purple_circle:`
-      }. *${goal.title}* - <https:/app.hypedocs.co/goal/${
-        goal.id
-      }|see progress>`
+      }. *${goal.title}*`
   );
   listGoalMessage = listGoalMessage + "\n\n" + messageList.join("\n");
 
-  listGoalMessage = `${listGoalMessage}\n\n\n\n:tada::tada: Keep adding all your small and big wins as you work towards your goals! :tada::tada:\n\nAdd more hypes by typing \`/hype add hype\` or add new goals by using \`/hype add goal\`.\nYou can also log on at <https://app.hypedocs.co/home|hypedocs.co>.`;
+  listGoalMessage = `${listGoalMessage}\n\n\n\n:tada::tada: Keep adding all your small and big wins as you work towards your goals! :tada::tada:\n\nAdd more hypes by typing \`/hype add hype\` or add new goals by using \`/hype add goal\`.\nYou can also log on at <https://hypedocs.co/app/home|hypedocs.co>.`;
 
   return listGoalMessage;
 };
