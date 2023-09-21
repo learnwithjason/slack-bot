@@ -13,6 +13,7 @@ import {
   getSlackListFromUserId,
   getSlackUserFromUidAndTeamId,
   createSlackUser,
+  createUser,
 } from "./utils/db";
 import { getCategoriesForSlack, SLACK_ACTIONS } from "./utils/enums";
 import { slackApi } from "./utils/slack";
@@ -29,6 +30,7 @@ import {
   getTodaysDateAsYYYYMMDDWithDashes,
 } from "./utils/dates";
 import { v4 as uuidv4 } from "uuid";
+import fetch from "node-fetch";
 
 export const handler: Handler = async (event) => {
   if (!event.body) {
@@ -39,7 +41,7 @@ export const handler: Handler = async (event) => {
   }
 
   const body = parse(event.body);
-  const { text, user_id, team_id } = body;
+  const { text, user_id, team_id, user_name } = body;
   if (!user_id || !team_id) {
     return { statusCode: 500, body: "Error: missing parameters" };
   }
@@ -59,19 +61,32 @@ export const handler: Handler = async (event) => {
   const WINS_CHANNEL_NAME = slackResp[0].wins_channel_name;
   const SLACK_DATA = slackResp[0];
 
+  /**
+   * Logic:
+   *  - if user exists: proceed
+   *    - else: create new user
+   *  - check if user exists in slackUser with this slackId:
+   *    - if user does not exist: create user using endpoint
+   *      - if slack type is BUSINESS, set to basic, else set to TRIAL
+   *    - add user to slackUser
+   *
+   */
+
   // check if user exists
-  const email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
-  const hypeUser = await getUserByEmail(email);
+  let email = await getUserEmailFromSlack(user_id, AUTH_TOKEN);
+  let hypeUser = await getUserByEmail(email);
 
   if (hypeUser.length < 1) {
-    await userNotFoundCommand(body, email, AUTH_TOKEN);
-
-    return {
-      statusCode: 200,
-      body: "User Not Found",
-    };
+    // no user found, create one now
+    let newUser = await createUser(
+      email,
+      user_name,
+      slackResp[0].installation_type
+    );
+    await checkUserInSlackUserElseCreate(newUser, body, slackResp[0]);
+    hypeUser = await getUserByEmail(email);
   } else {
-    checkUserInSlackUserElseCreate(hypeUser[0], body, slackResp[0]);
+    await checkUserInSlackUserElseCreate(hypeUser[0], body, slackResp[0]);
   }
 
   let action = getActionFromText(text);
@@ -119,18 +134,13 @@ let checkUserInSlackUserElseCreate = async (
   dataFromSlack,
   slackDataFromDb
 ) => {
-  // logic:
-  //    if user/teamId in slackUser, return
-  //    else:
-  //      get missing info
-  //      create slack user
-
   const slackUser = await getSlackUserFromUidAndTeamId(
     hypeUser.uid,
     dataFromSlack.team_id
   );
 
   if (slackUser.length > 0) {
+    // user has a slackUser entry so we can return
     return;
   }
 

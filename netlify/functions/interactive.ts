@@ -125,9 +125,6 @@ const addGoalAction = async (payload, authToken, winsChannelId) => {
   // then craft and output a message accordingly
   // check for rate limiting stuff
   if (slackData.share_multiple.length > 0) {
-    console.log(
-      `slackData.share_multiple: ${JSON.stringify(slackData.share_multiple)}`
-    );
     for (const slack of slackData.share_multiple) {
       let slackValueSplit = slack.value.split("_");
       let slackId = slackValueSplit[0];

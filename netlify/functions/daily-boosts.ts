@@ -41,7 +41,6 @@ const dailyBoosts: Handler = async (event) => {
   // use this version to test the function directly in production
   //  note: will need to deploy to production.
   // export const handler: Handler = async (event) => {
-  console.log(`start of daily boost flow`);
   let usersOnSlack = await getUsersOnSlack();
 
   // creating an object of all the promises to ensure we execute
@@ -102,10 +101,8 @@ const getUsersOnSlack = async () => {
 
 const hypeBoost = async (user, slack) => {
   let selectedHype = await getRandomHypeForUser(user.user_id);
-  console.log(`selectedHype: ${JSON.stringify(selectedHype)}`);
 
   if (selectedHype.length === 0) {
-    console.log(`sending generic hype to: ${user.name}`);
     // default case, user has no hypes so send a generic prompt
     await dailyHypeBoostGeneric(
       user.user_slack_id,
@@ -113,7 +110,6 @@ const hypeBoost = async (user, slack) => {
       slack[0].access_token
     );
   } else {
-    console.log(`sending hype to: ${user.name} - ${selectedHype[0].title}`);
     await dailyBoostHype(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
@@ -128,7 +124,6 @@ const goalBoost = async (user, slack) => {
 
   if (!selectedGoal) {
     // default in case no hype found, use generic prompt
-    console.log(`sending generic goal to: ${user.name}`);
     await dailyGoalBoostGeneric(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,
@@ -136,7 +131,6 @@ const goalBoost = async (user, slack) => {
     );
   } else {
     // update message if Hype was found
-    console.log(`sending goal to: ${user.name} - ${selectedGoal[0].title}`);
     await dailyBoostGoal(
       user.user_slack_id,
       user.name ? user.name : user.slack_username,

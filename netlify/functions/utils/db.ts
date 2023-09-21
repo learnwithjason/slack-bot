@@ -1,8 +1,10 @@
 import { firebaseAdmin } from "./firebase";
 import { v4 as uuidv4 } from "uuid";
 import { SlackOption } from "./interfaces";
+import { getTodaysDateAsTimestamp } from "./dates";
 
 const firestore = firebaseAdmin.firestore();
+const auth = firebaseAdmin.auth();
 
 export const getSlackAccount = async (teamId) => {
   return firestore
@@ -18,6 +20,35 @@ export const createHype = async (hypeData) => {
 
 export const createGoal = async (goalData) => {
   return firestore.collection("goals").add(goalData);
+};
+
+export const createUser = async (email, name, installationType) => {
+  return auth
+    .createUser({ email })
+    .then(async (authUser) => {
+      let userData = {
+        uid: authUser.uid,
+        email: authUser.email,
+        name: name,
+        // TODO(aashni): add more data fields like timestamp etc
+        date: getTodaysDateAsTimestamp(),
+        dateUpdated: getTodaysDateAsTimestamp(),
+        onboardingStep: -1,
+        status:
+          installationType === "PERSONAL" ? "TRIAL_SLACK" : "BASIC_ORG_SLACK",
+      };
+
+      await createUserInFirestore(userData);
+
+      return userData;
+    })
+    .catch((e) => {
+      console.log(`an error has occured: ${e}`);
+    });
+};
+
+export const createUserInFirestore = async (data) => {
+  return firestore.collection("users").add(data);
 };
 
 export const getUser = async (uid) => {
