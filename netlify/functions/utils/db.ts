@@ -2,6 +2,7 @@ import { firebaseAdmin } from "./firebase";
 import { v4 as uuidv4 } from "uuid";
 import { SlackOption } from "./interfaces";
 import { getTodaysDateAsTimestamp } from "./dates";
+import { addUserToHDMailerlite } from "./mail";
 
 const firestore = firebaseAdmin.firestore();
 const auth = firebaseAdmin.auth();
@@ -39,6 +40,7 @@ export const createUser = async (email, name, installationType) => {
       };
 
       await createUserInFirestore(userData);
+      await addUserToHDMailerlite(email, name);
 
       return userData;
     })
