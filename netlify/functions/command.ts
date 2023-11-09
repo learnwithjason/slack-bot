@@ -623,7 +623,7 @@ const addGoalCommand = async (
           type: "section",
           text: {
             type: "mrkdwn",
-            text: "Submit this form to add a new Goal to your HypeDoc! Or, if you prefer, you can <https://hypedocs.co/app/home|goals add your goal through the browser>.",
+            text: "Submit this form to add a new Goal to your HypeDoc! Or, if you prefer, you can <https://hypedocs.co/app/home| add your goal through the browser>.",
           },
         },
         {
@@ -653,7 +653,7 @@ const addGoalCommand = async (
           type: "input",
           label: {
             type: "plain_text",
-            text: "How do you categorize this Hype?",
+            text: "What type of Goal are you creating?",
           },
           element: {
             action_id: "category",
