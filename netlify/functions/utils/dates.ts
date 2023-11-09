@@ -37,7 +37,7 @@ export const getTodaysDateAsTimestamp = () => {
 export const getTodaysDateAsYYYYMMDDWithDashes = () => {
   let today = new Date();
   let year = today.getFullYear();
-  let month = today.getMonth();
+  let month = today.getMonth() + 1;
   let day = today.getDate();
   return `${year}-${month}-${day}`;
 };
